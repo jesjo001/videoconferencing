@@ -13,6 +13,7 @@
     <script src="https://kit.fontawesome.com/1437bce5af.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
       const ROOM_ID = "<%= roomId %>";
       console.log("<%= roomId %>");
@@ -29,11 +30,11 @@
 
         <div class="main_controls">
             <div class="main_controls_block">
-                <div class="main_controls_button">
+                <div onclick="muteUnmute()" class="main_controls_button main_mute_button">
                     <i class="fas fa-microphone"></i>
                     <span>Mute</span>
                 </div>
-                <div class="main_controls_button">
+                <div onclick="playStop()" class="main_controls_button main_video_button">
                     <i class="fas fa-video"></i>
                     <span>Stop Video</span>
                 </div>
