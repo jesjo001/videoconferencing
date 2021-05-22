@@ -22,6 +22,10 @@
     <link rel="stylesheet" href="/css/bootstrap.css" />
 
     <link rel="stylesheet" href="/css/mobster.css" />
+    <script>
+      const user = "<%= user %>";
+      console.log("<%= title %>");
+    </script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light navbar-floating">
@@ -29,17 +33,6 @@
         <a class="navbar-brand" href="#">
           <img src="/favicon.png" alt="" width="40" />
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarToggler"
-          aria-controls="navbarToggler"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
 
         <div class="collapse navbar-collapse" id="navbarToggler">
           <ul class="navbar-nav ml-lg-5 mt-3 mt-lg-0">
@@ -53,13 +46,28 @@
               <a class="nav-link" href="#contactUs">Contact</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/user/login">login / Sign Up</a>
+              <a class="nav-link" href="/logout">Dashboard</a>
             </li>
+
+            <span class="d-flex float-end justify-content-end">
+              <a class="nav-link" href="#"></a>
+            </span>
           </ul>
+
           <!-- <div class="ml-auto my-2 my-lg-0">
             <button class="btn btn-dark rounded-pill">Download Now</button>
           </div> -->
         </div>
+        <ul class="navbar-nav ml-lg-5 mt-3 mt-lg-0 justify-content-end">
+          <li class="nav-item">
+            <a class="nav-link active text-light" href="/dashboard"
+              ><%= user.email %></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active text-light" href="/logout">logout</a>
+          </li>
+        </ul>
       </div>
     </nav>
 
@@ -79,9 +87,15 @@
                 Welcome to the most featured meeting Platform. Where you can
                 connect with Teams, Colleagues, Friends and Family
               </p>
-              <a href="/user/login" class="btn btn-primary rounded-pill"
-                >Schedule a Meeting</a
+              <button
+                type="button"
+                class="btn btn-primary rounded-pill"
+                data-toggle="modal"
+                data-target="#exampleModal"
               >
+                Schedule a Meeting
+              </button>
+
               <a
                 href="/instant-meeting"
                 class="btn btn-gradient btn-split-icon rounded-pill"
@@ -92,6 +106,113 @@
             <div class="col-lg-6 d-none d-lg-block wow zoomIn">
               <div class="img-place mobile-preview shadow floating-animate">
                 <img src="/img/app_preview_1.png" alt="" />
+              </div>
+            </div>
+
+            <!-- Button trigger modal -->
+            <!-- <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#exampleModal"
+      >
+        Launch demo modal
+      </button> -->
+
+            <!-- Modal -->
+            <div
+              class="modal fade"
+              id="exampleModal"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                      Schedule a Meeting
+                    </h5>
+                    <button
+                      type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form action="/scheduleMeeting" method="POST">
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="meetingTitle" class="form-label"
+                          >Meeting Title</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="meetingTitle"
+                          aria-describedby="emailHelp"
+                          name="meetingTitle"
+                        />
+                        <div id="emailHelp" class="form-text">
+                          We'll never share your email with anyone else.
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="info" class="form-label"
+                          >Brief Info about meeting (optional)</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="info"
+                          aria-describedby="emailHelp"
+                          name="briefInfo"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="startdate" class="form-label"
+                          >Meeting Date</label
+                        >
+                        <input
+                          type="date"
+                          id="startdate"
+                          name="meetingStart"
+                          value="2018-07-22"
+                          min="2021-01-01"
+                          max="2030-12-31"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label class="meetingtime" for="exampleCheck1"
+                          >Choose a time for your meeting</label
+                        >
+                        <input
+                          type="time"
+                          id="meetingtime"
+                          name="meetingTime"
+                          min="00:00"
+                          max="23:59"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                      <button type="submit" class="btn btn-primary">
+                        Save changes
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -429,9 +550,14 @@
         </div>
       </div>
     </div>
+    <!-- Modal Body-->
 
     <script src="/js/jquery-3.5.1.min.js"></script>
-
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+      integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+      crossorigin="anonymous"
+    ></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
 
     <script src="/vendor/owl-carousel/js/owl.carousel.min.js"></script>
