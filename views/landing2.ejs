@@ -19,12 +19,27 @@
       href="/vendor/owl-carousel/css/owl.carousel.min.css"
     />
 
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="/css/bootstrap.css" />
 
     <link rel="stylesheet" href="/css/mobster.css" />
     <script>
       const user = "<%= user %>";
       console.log("<%= title %>");
+
+      let newError = "<%= newError  %>" || "false";
+      let displayError;
+      let error = [];
+      if (newError === "true") {
+        error.push("<%= error  %>");
+        displayError = error.pop();
+        //display error using toast notification
+        toastr.error(displayError);
+      }
     </script>
   </head>
   <body>
@@ -551,6 +566,8 @@
       </div>
     </div>
     <!-- Modal Body-->
+
+    <script></script>
 
     <script src="/js/jquery-3.5.1.min.js"></script>
     <script
