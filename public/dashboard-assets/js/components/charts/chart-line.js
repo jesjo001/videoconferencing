@@ -4,7 +4,7 @@
 // Sales chart
 //
 
-var SalesChart = (function() {
+var SalesChart = (function () {
 
   // Variables
 
@@ -14,6 +14,8 @@ var SalesChart = (function() {
   // Methods
 
   function init($chart) {
+
+    const labels = Utils.months({ count: 7 });
 
     var salesChart = new Chart($chart, {
       type: 'line',
@@ -26,9 +28,10 @@ var SalesChart = (function() {
               zeroLineColor: Charts.colors.gray[900]
             },
             ticks: {
-              callback: function(value) {
+              callback: function (value) {
                 if (!(value % 10)) {
-                  return '$' + value + 'k';
+                  //prefix and suffix
+                  return '' + value + '';
                 }
               }
             }
@@ -36,7 +39,7 @@ var SalesChart = (function() {
         },
         tooltips: {
           callbacks: {
-            label: function(item, data) {
+            label: function (item, data) {
               var label = data.datasets[item.datasetIndex].label || '';
               var yLabel = item.yLabel;
               var content = '';
@@ -45,14 +48,14 @@ var SalesChart = (function() {
                 content += '<span class="popover-body-label mr-auto">' + label + '</span>';
               }
 
-              content += '<span class="popover-body-value">$' + yLabel + 'k</span>';
+              content += '<span class="popover-body-value">' + yLabel + '</span>';
               return content;
             }
           }
         }
       },
       data: {
-        labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: labels,
         datasets: [{
           label: 'Performance',
           data: [0, 20, 10, 30, 15, 40, 20, 60, 60]

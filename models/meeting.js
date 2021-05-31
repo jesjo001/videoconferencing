@@ -22,6 +22,10 @@ const meetingSchema = new Schema({
         type: String,
         require: true
     },
+    meetingType: {
+        type: String,
+        require: false
+    },
 }, { timestamps: true });
 
 const Meeting = mongoose.model('Meeting', meetingSchema);
