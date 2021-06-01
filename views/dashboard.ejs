@@ -22,12 +22,19 @@
     <link rel="stylesheet" href="/css/bootstrap.css" />
 
     <link rel="stylesheet" href="/css/mobster.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
 
     <script src="/js/bootstrap.min.js"></script>
     <script
       src="https://kit.fontawesome.com/1437bce5af.js"
       crossorigin="anonymous"
     ></script>
+    <style>
+      .table.sticky th {
+        position: sticky;
+        top: 20px;
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light navbar-floating">
@@ -82,7 +89,7 @@
                 background-color: rgba(78, 78, 78, 0.377);
                 border-radius: 25px;
                 padding: 20px;
-                min-height: 70vh;
+                height: 70vh;
               "
             >
               <!-- <h1 class="mb-4">Creative Teams</h1>
@@ -123,6 +130,7 @@
                       data-bs-toggle="tooltip"
                       title="View Scheduled Meetings"
                     ></i>
+                    Scheduled Meetings
                   </button>
                   <button
                     class="nav-link btn-secondary"
@@ -140,6 +148,7 @@
                       data-bs-toggle="tooltip"
                       title="profile"
                     ></i>
+                    Profile
                   </button>
                   <button
                     class="nav-link"
@@ -157,6 +166,7 @@
                       data-bs-toggle="tooltip"
                       title="Schedule Meeting"
                     ></i>
+                    Schedule meeting
                   </button>
                   <button
                     class="nav-link"
@@ -195,12 +205,39 @@
                 </div>
                 <div class="tab-content" id="v-pills-tabContent">
                   <div
-                    class="tab-pane fade show active"
+                    class="tab-pane fade show active table-responsive"
                     id="v-pills-home"
                     role="tabpanel"
                     aria-labelledby="v-pills-home-tab"
                   >
-                    ...
+                    <table
+                      class="table table-light table-bordered sticky"
+                      style="height: 300px; overflow-y: scroll; display: block"
+                    >
+                      <thead class="table-dark">
+                        <td>Meeting Title</td>
+                        <td>Brief info</td>
+                        <td>Meeting Starts</td>
+                        <td>Scheduled at</td>
+                        <td>Meeting link</td>
+                        <td>Date</td>
+                      </thead>
+                      <tbody>
+                        <% if(meetings.length > 0){ %> <%
+                        meetings.forEach(meeting => { %>
+                        <tr class="">
+                          <td><%= meeting.title %></td>
+                          <td><%= meeting.briefInfo %></td>
+                          <td><%= meeting.startAt.toUTCString() %></td>
+                          <td><%= meeting.createdAt.toDateString() %></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                        <% }) %> <% } else { %>
+                        <td>You are yet to schedule a meeting</td>
+                        <% } %>
+                      </tbody>
+                    </table>
                   </div>
                   <div
                     class="tab-pane fade"

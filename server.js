@@ -126,11 +126,19 @@ app.get("/", (req, res) => {
 
 app.get("/welcome", isLoggedIn, (req, res) => {
     console.log("user is ", req.user)
-    res.render('landing2', { title: "Home", user: req.user });
+    res.render('landing2', { title: "Home", user: req.user, newError: false, error: "" });
 })
 
 app.get("/dashboard", isLoggedIn, (req, res) => {
-    res.render('dashboard', { title: "Home" });
+    Meeting.find().sort({ createdAt: -1 })
+        .then((result) => {
+            console.log(result)
+            res.render('dashboard', { title: "Dashboard", user: req.user, meetings: result })
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    // res.render('dashboard', { title: "Dashboard" });
 })
 
 
@@ -192,15 +200,18 @@ app.post('/register', async (req, res) => {
 
 })
 
-app.post('/scheduleMeeting', (req, res) => {
+app.post('/scheduleMeeting', isLoggedIn, (req, res) => {
     console.log(req.body)
     let userId = req.user.id;
+    let meetDate = new Date(req.body.meetingStart);
+    let time = req.body.meetingTime.split(":")
+    meetDate.setHours(time[0], time[1])
 
     console.log("user id is: ", userId)
     const meeting = new Meeting({
         title: req.body.meetingTitle,
         briefInfo: req.body.briefInfo,
-        startAt: req.body.meetingStart,
+        startAt: meetDate,
         time: req.body.meetingTime,
         userId: userId
     })
@@ -211,15 +222,16 @@ app.post('/scheduleMeeting', (req, res) => {
                 pathname: "/welcome",
                 query: {
                     "messageType": "success",
-                    "message": "Meeting Scheduled Successfully!"
+                    "title": "Home",
+                    "message": "Meeting Scheduled Successfully!",
+                    "errorType": "Message"
                 }
             }));
 
         })
         .catch((err) => {
             console.log(err)
-
-            return res.render('landing2', { error: error })
+            return res.render('landing2', { error: "Something went wrong", newError: "true", title: "Home", user: req.user })
         })
 
     console.log(meeting)
