@@ -13,6 +13,7 @@ const localStrategy = require('passport-local').Strategy;
 const session = require('express-session')
 const morgan = require('morgan')
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const peerServer = ExpressPeerServer(server, {
     debug: true
@@ -141,6 +142,53 @@ app.get("/dashboard", isLoggedIn, (req, res) => {
     // res.render('dashboard', { title: "Dashboard" });
 })
 
+app.get("/dashboard2", isLoggedIn, async (req, res) => {
+
+    const total = await Meeting.countDocuments({ userId: req.user._id })
+    const monthStart = moment().startOf('month');
+    const monthEnd = moment().endOf('month');
+    const today = new Date()
+
+    const amonthMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+    const yearStart = moment().startOf('year');
+    const yearEnd = moment().endOf('year');
+    const thisYearMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(yearStart), $lte: new Date(yearEnd) } })
+
+    const upcomingMeetingCount = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(today) } })
+    const upcomingMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(today) } })
+    const monthlyMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+
+    console.log(`amonthMeetings is ${amonthMeetings} total user meeting ${total} yearly meeting ${thisYearMeetings}`)
+    console.log("upcoming meeting are ", upcomingMeeting.length)
+    Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
+        .then((result) => {
+            // console.log(result)
+            console.log(req.user)
+            res.render('dashboard2', {
+                title: "Dashboard",
+                user: {
+                    email: req.user.email,
+                    username: req.user.username,
+                    createdAt: req.user.createdAt,
+                    updatedAt: req.user.updatedAt
+                },
+                meetings: result,
+                upcomingMeeting,
+                monthlyMeeting,
+                statistics: {
+                    amonthMeetings,
+                    total,
+                    thisYearMeetings,
+                    upcomingMeetingCount: upcomingMeeting.length
+                }
+            })
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    // res.render('dashboard', { title: "Dashboard" });
+})
+
 
 app.get("/user/register", (req, res) => {
     res.render('user_register');
@@ -158,7 +206,9 @@ app.post('/register', async (req, res) => {
 
     if (numDoc == 0) {
         try {
-            const hashedPassword = await bcrypt.hash(req.body.password, 10)
+            console.log("got here")
+            console.log("REQUEST IS ", req.body)
+            const hashedPassword = await bcrypt.hash(req.body.password2, 10)
             console.log(hashedPassword)
 
             const user = new User({
@@ -280,6 +330,10 @@ app.post('/login', passport.authenticate('local', {
 app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
+})
+
+app.get('/newView', function (req, res) {
+    res.render('newView');
 })
 
 app.get('/setup', async (req, res) => {
