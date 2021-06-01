@@ -1,5 +1,5 @@
 const socket = io('/')
-const videoGrid =  document.getElementById('video-grid')
+const videoGrid = document.getElementById('video-grid')
 let peer = new Peer(undefined, {
     path: '/peerjs',
     host: '/',
@@ -20,6 +20,7 @@ navigator.mediaDevices.getUserMedia({
     peer.on('call', call => {
         call.answer(stream)
         const video = document.createElement('video')
+
         call.on('stream', userVideoStream => {
             addVideoStream(video, userVideoStream)
         })
@@ -32,14 +33,15 @@ navigator.mediaDevices.getUserMedia({
     let text = $('input')
     $('html').keydown((e) => {
         console.log("key down")
-        if(e.which == 13 && text.val().length !==0){
-            console.log(text.val()) 
+        if (e.which == 13 && text.val().length !== 0) {
+            console.log(text.val())
             socket.emit('message', text.val());
             text.val('')
         }
     });
 
-    socket.on('createMessage', message =>{
+
+    socket.on('createMessage', message => {
         console.log("new message is ", message)
         $('ul').append(`<li class="message"><b>user</b><br/>${message} </li>`)
         scrollToButtom()
@@ -47,7 +49,7 @@ navigator.mediaDevices.getUserMedia({
 })
 
 socket.on('user-disconnected', userId => {
-    if(peers[userId]) peers[userId].close()
+    if (peers[userId]) peers[userId].close()
 })
 
 peer.on('open', id => {
@@ -59,9 +61,9 @@ peer.on('open', id => {
 
 //connect  a new user
 const connectToNewUser = (userId, stream) => {
-    const call = peer.call(userId, stream )
+    const call = peer.call(userId, stream)
     const video = document.createElement('video')
-    call.on('stream', userVideoStream =>{
+    call.on('stream', userVideoStream => {
         addVideoStream(video, userVideoStream)
     })
     call.on('close', () => {
@@ -77,7 +79,7 @@ const addVideoStream = (video, stream) => {
         video.play()
     })
     videoGrid.append(video)
-} 
+}
 
 //always scroll chat section to bottom
 const scrollToButtom = () => {
@@ -89,16 +91,16 @@ const scrollToButtom = () => {
 const muteUnmute = () => {
     const enabled = myVideoStream.getAudioTracks()[0].enabled;
 
-    if(enabled){
+    if (enabled) {
         myVideoStream.getAudioTracks()[0].enabled = false;
         setMuteButton();
-    } else { 
-        myVideoStream.getAudioTracks()[0].enabled = true;
+    } else {
         setUnmuteButton();
+        myVideoStream.getAudioTracks()[0].enabled = true;
     }
 }
 
-//Video controll section 
+//Video control section 
 //Play stop video
 
 const playStop = () => {
@@ -107,12 +109,10 @@ const playStop = () => {
     if (enabled) {
         myVideoStream.getVideoTracks()[0].enabled = false;
         setStopVideo()
-
     } else {
-        myVideoStream.getVideoTracks()[0].enabled = true;
         setPlayVideoIcon()
+        myVideoStream.getVideoTracks()[0].enabled = true;
     }
-
 }
 
 const setMuteButton = () => {
@@ -133,8 +133,6 @@ const setUnmuteButton = () => {
 
 
 
-
-    
 
 const setStopVideo = () => {
     const html = `

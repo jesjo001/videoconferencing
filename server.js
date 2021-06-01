@@ -1,11 +1,13 @@
 const express = require('express');
-const bcrypt = require('bcrypt')
 const app = express();
+//
+const bcrypt = require('bcrypt')
 const server = require('http').Server(app);
 const { v4: uuidv4 } = require('uuid')
 const io = require('socket.io')(server)
 const { ExpressPeerServer } = require('peer')
 const User = require('./models/blog')
+const Meeting = require('./models/meeting')
 const passport = require('passport')
 const localStrategy = require('passport-local').Strategy;
 const session = require('express-session')
@@ -19,7 +21,7 @@ const peerServer = ExpressPeerServer(server, {
 //connect to db
 const dbURI = "mongodb://localhost:27017/creative-teams"
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((result) => server.listen(3040))
+    .then((result) => server.listen(3030))
     .catch((err) => console.log(err))
 
 //Error
@@ -51,25 +53,8 @@ function isLoggedIn(req, res, next) {
 
 function isLoggedOut(req, res, next) {
     if (!req.isAuthenticated()) return next();
-    res.redirect('/dashboard')
+    res.redirect('/welcome')
 }
-
-io.on('connection', socket => {
-    socket.on('join-room', (roomId, userId) => {
-        socket.join(roomId);
-        socket.to(roomId).emit('user-connected', userId);
-
-        socket.on('message', message => {
-            //send message to the same room
-            io.to(roomId).emit('createMessage', message)
-        })
-
-        socket.on('disconnect', () => {
-            socket.to(roomId).emit('user-disconnected', userId)
-        })
-    })
-})
-
 
 passport.serializeUser(function (user, done) {
     done(null, user.id)
@@ -115,19 +100,36 @@ passport.use(new localStrategy({
 
 
 //Routes
-app.get("/home", (req, res) => {
-    res.render('landing', { title: "Home" });
+// app.get("/home", (req, res) => {
+//     res.render('landing', { title: "Home" });
+// })
+
+io.on('connection', socket => {
+    socket.on('join-room', (roomId, userId) => {
+        socket.join(roomId);
+        socket.to(roomId).emit('user-connected', userId);
+
+        socket.on('message', message => {
+            //send message to the same room
+            io.to(roomId).emit('createMessage', message)
+        })
+
+        socket.on('disconnect', () => {
+            socket.to(roomId).emit('user-disconnected', userId)
+        })
+    })
 })
 
-app.get("/home2", (req, res) => {
-    res.render('landing2', { title: "Home" });
+app.get("/", (req, res) => {
+    res.render('index', { title: "Home" });
 })
 
-app.get("/dashboard", (req, res) => {
-    res.render('home', { title: "Home" });
+app.get("/welcome", isLoggedIn, (req, res) => {
+    console.log("user is ", req.user)
+    res.render('landing2', { title: "Home", user: req.user });
 })
 
-app.get("/newdashboard", (req, res) => {
+app.get("/dashboard", isLoggedIn, (req, res) => {
     res.render('dashboard', { title: "Home" });
 })
 
@@ -190,8 +192,41 @@ app.post('/register', async (req, res) => {
 
 })
 
+app.post('/scheduleMeeting', (req, res) => {
+    console.log(req.body)
+    let userId = req.user.id;
+
+    console.log("user id is: ", userId)
+    const meeting = new Meeting({
+        title: req.body.meetingTitle,
+        briefInfo: req.body.briefInfo,
+        startAt: req.body.meetingStart,
+        time: req.body.meetingTime,
+        userId: userId
+    })
+
+    meeting.save()
+        .then(() => {
+            return res.redirect(url.format({
+                pathname: "/welcome",
+                query: {
+                    "messageType": "success",
+                    "message": "Meeting Scheduled Successfully!"
+                }
+            }));
+
+        })
+        .catch((err) => {
+            console.log(err)
+
+            return res.render('landing2', { error: error })
+        })
+
+    console.log(meeting)
+})
+
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/dashboard',
+    successRedirect: '/welcome',
     failureRedirect: '/user/login?error=true'
 }))
 
@@ -232,7 +267,7 @@ app.post('/login', passport.authenticate('local', {
 
 app.get('/logout', function (req, res) {
     req.logout();
-    res.redirect('/home');
+    res.redirect('/');
 })
 
 app.get('/setup', async (req, res) => {
