@@ -130,7 +130,7 @@ app.get("/welcome", isLoggedIn, (req, res) => {
     res.render('landing2', { title: "Home", user: req.user, newError: false, error: "" });
 })
 
-app.get("/dashboard", isLoggedIn, (req, res) => {
+app.get("/dashboard2", isLoggedIn, (req, res) => {
     Meeting.find().sort({ createdAt: -1 })
         .then((result) => {
             console.log(result)
@@ -142,24 +142,25 @@ app.get("/dashboard", isLoggedIn, (req, res) => {
     // res.render('dashboard', { title: "Dashboard" });
 })
 
-app.get("/dashboard2", isLoggedIn, async (req, res) => {
+app.get("/dashboard", isLoggedIn, async (req, res) => {
 
     const total = await Meeting.countDocuments({ userId: req.user._id })
     const monthStart = moment().startOf('month');
     const monthEnd = moment().endOf('month');
     const today = new Date()
-
-    const amonthMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
     const yearStart = moment().startOf('year');
     const yearEnd = moment().endOf('year');
-    const thisYearMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(yearStart), $lte: new Date(yearEnd) } })
 
-    const upcomingMeetingCount = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(today) } })
+    const thisYearMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(yearStart), $lte: new Date(yearEnd) } })
+    const amonthMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+
     const upcomingMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(today) } })
     const monthlyMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+    let graphData = await getMonthlyData(req.user);
 
-    console.log(`amonthMeetings is ${amonthMeetings} total user meeting ${total} yearly meeting ${thisYearMeetings}`)
-    console.log("upcoming meeting are ", upcomingMeeting.length)
+    const weekNumber = moment().format("w");
+    console.log("weekNumber is " + weekNumber)
+
     Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
         .then((result) => {
             // console.log(result)
@@ -179,8 +180,10 @@ app.get("/dashboard2", isLoggedIn, async (req, res) => {
                     amonthMeetings,
                     total,
                     thisYearMeetings,
-                    upcomingMeetingCount: upcomingMeeting.length
-                }
+                    upcomingMeetingCount: upcomingMeeting.length,
+
+                },
+                newData: graphData
             })
         })
         .catch((err) => {
@@ -189,6 +192,46 @@ app.get("/dashboard2", isLoggedIn, async (req, res) => {
     // res.render('dashboard', { title: "Dashboard" });
 })
 
+app.get("/meetings", isLoggedIn, async (req, res) => {
+
+    console.log("requesr query is  ")
+    console.log(req.query)
+
+    if (req.query.search) {
+        console.log("search is active")
+    }
+
+    const monthStart = moment().startOf('month');
+    const monthEnd = moment().endOf('month');
+    const today = new Date()
+    const upcomingMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(today) } })
+    const monthlyMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+
+    const weekNumber = moment().format("w");
+    console.log("weekNumber is " + weekNumber)
+
+    Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
+        .then((result) => {
+            // console.log(result)
+            console.log(req.user)
+            res.render('meetingList', {
+                title: "Dashboard",
+                user: {
+                    email: req.user.email,
+                    username: req.user.username,
+                    createdAt: req.user.createdAt,
+                    updatedAt: req.user.updatedAt
+                },
+                meetings: result,
+                upcomingMeeting,
+                monthlyMeeting,
+            })
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    // res.render('dashboard', { title: "Dashboard" });
+})
 
 app.get("/user/register", (req, res) => {
     res.render('user_register');
@@ -207,6 +250,7 @@ app.post('/register', async (req, res) => {
     if (numDoc == 0) {
         try {
             console.log("got here")
+
             console.log("REQUEST IS ", req.body)
             const hashedPassword = await bcrypt.hash(req.body.password2, 10)
             console.log(hashedPassword)
@@ -252,6 +296,8 @@ app.post('/register', async (req, res) => {
 
 app.post('/scheduleMeeting', isLoggedIn, (req, res) => {
     console.log(req.body)
+    console.log("requesr query is  ")
+    console.log(req.query)
     let userId = req.user.id;
     let meetDate = new Date(req.body.meetingStart);
     let time = req.body.meetingTime.split(":")
@@ -291,41 +337,6 @@ app.post('/login', passport.authenticate('local', {
     successRedirect: '/welcome',
     failureRedirect: '/user/login?error=true'
 }))
-
-// app.post('/login', async (req, res) => {
-//     console.log("request body is ", req.body)
-//     const user = await User.findOne({ email: req.body.useremail })
-//     // .then((res) => {
-//     //     console.log("response user", res)
-//     // })
-//     console.log("user is ", user)
-//     if (user == null) {
-//         console.log("NO USER")
-//         error.push('Cannot find User. The email is not registered')
-//         newError = true;
-//         return res.render('login', { title: 'Login / Sign Up', newError, error: error.pop() });
-
-//     }
-
-//     try {
-//         if (await bcrypt.compare(req.body.userpassword, user.password)) {
-//             //bert alert success and redirect to dashboard or home page or profile page
-//             return res.json({ success: true, message: "Success", user })
-//         }
-
-//         //bert alert Credentials does not match
-//         error.push("Credentials does not match")
-//         newError = true;
-//         return res.render('login', { title: 'Login / Sign Up', newError, error: error.pop() });
-
-//     } catch (e) {
-//         console.log("Error ", e)
-//         error.push('It seems you dont have internet access')
-//         newError = true;
-//         return res.render('login', { title: 'Login / Sign Up', newError, error: error.pop() });
-//         //return res.status(500).json({ message: "It seems you dont have internet access" })
-//     }
-// })
 
 app.get('/logout', function (req, res) {
     req.logout();
@@ -373,3 +384,56 @@ app.get('/:room', (req, res) => {
     // console.log("room Id ", req.params.room)
     res.render('room', { roomId: req.params.room, title: "Room" })
 })
+
+
+const getMonthlyData = async (user) => {
+    const monthStart = moment().startOf('month');
+    const monthEnd = moment().endOf('month');
+    const yearStart = moment().startOf('year');
+    const yearEnd = moment().endOf('year');
+    const thisYearMeetings = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(yearStart), $lte: new Date(yearEnd) } })
+    const lastMonthBegins = moment().subtract(1, 'months').startOf('month')
+    const lastMonthEnds = moment().subtract(1, 'months').endOf('month')
+    const previousMonthBegins = moment().subtract(2, 'months').startOf('month')
+    const previousMonthEnds = moment().subtract(2, 'months').endOf('month')
+    const threeMonthBackBegins = moment().subtract(3, 'months').startOf('month')
+    const threeMonthBackEnds = moment().subtract(3, 'months').endOf('month')
+    const fourMonthBackBegins = moment().subtract(4, 'months').startOf('month')
+    const fourMonthBackEnds = moment().subtract(4, 'months').endOf('month')
+    const fiveMonthBackBegins = moment().subtract(5, 'months').startOf('month')
+    const fiveMonthBackEnds = moment().subtract(5, 'months').endOf('month')
+    const sixMonthBackBegins = moment().subtract(6, 'months').startOf('month')
+    const sixMonthBackEnds = moment().subtract(6, 'months').endOf('month')
+    const sevenMonthBackBegins = moment().subtract(7, 'months').startOf('month')
+    const sevenMonthBackEnds = moment().subtract(7, 'months').endOf('month')
+
+
+    const monthlyMeeting = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+    const lastMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(lastMonthBegins), $lte: new Date(lastMonthEnds) } })
+    const previousMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(previousMonthBegins), $lte: new Date(previousMonthEnds) } })
+    const threeMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(threeMonthBackBegins), $lte: new Date(threeMonthBackEnds) } })
+    const fourMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(fourMonthBackBegins), $lte: new Date(fourMonthBackEnds) } })
+    const fiveMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(fiveMonthBackBegins), $lte: new Date(fiveMonthBackEnds) } })
+    const sixMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(sixMonthBackBegins), $lte: new Date(sixMonthBackEnds) } })
+
+    return [
+        monthlyMeeting,
+        lastMonthCount,
+        previousMonthCount,
+        threeMonthCount,
+        fourMonthCount,
+        fiveMonthCount,
+        sixMonthCount,
+    ]
+
+}
+
+const getWeeklyData = async () => {
+    const weekStart = moment().startOf('week');
+    const weekEnd = moment().endOf('week');
+    const lastWeekBegins = moment().subtract(1, 'months').startOf('month')
+    const lastWeekEnds = moment().subtract(1, 'months').endOf('month')
+    const previousWeekBegins = moment().subtract(1, 'months').startOf('month')
+    const previousWeekEnds = moment().subtract(1, 'months').endOf('month')
+
+}

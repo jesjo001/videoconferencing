@@ -26,7 +26,7 @@
       content="Start your development with a Dashboard for Bootstrap 4."
     />
     <meta name="author" content="Creative Tim" />
-    <title>Argon Dashboard - Free Dashboard for Bootstrap 4</title>
+    <title>Creative Teams | Dashboard</title>
     <!-- Favicon -->
     <link
       rel="icon"
@@ -60,6 +60,29 @@
       src="https://kit.fontawesome.com/1437bce5af.js"
       crossorigin="anonymous"
     ></script>
+
+    <script>
+  
+      let newData2 = "<%= newData %>";
+      let isWeekly = false;
+      newData2 = newData2.split(",");
+      console.log(newData2);
+      console.log(typeof newData2);
+
+
+      if(document.getElementById('weeklyGraph').clicked == true)
+      {
+        isWeekly = true;
+      }
+
+      if(document.getElementById('monthlyGraph').clicked == true)
+      {
+        isWeekly = false;
+      }
+
+
+      console.log("data from front End: ", newData.currentMonth);
+    </script>
   </head>
 
   <body>
@@ -91,13 +114,13 @@
             <!-- Nav items -->
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link active" href="examples/dashboard.html">
+                <a class="nav-link active" href="/dashboard">
                   <i class="ni ni-tv-2 text-primary"></i>
                   <span class="nav-link-text">Dashboard</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="examples/tables.html">
+                <a class="nav-link" href="/meetings">
                   <i class="ni ni-bullet-list-67 text-yellow"></i>
                   <span class="nav-link-text">Meetings</span>
                 </a>
@@ -634,16 +657,16 @@
                     <i class="ni ni-settings-gear-65"></i>
                     <span>Settings</span>
                   </a>
-                  <a href="#!" class="dropdown-item">
+                  <!-- <a href="#!" class="dropdown-item">
                     <i class="ni ni-calendar-grid-58"></i>
                     <span>Activity</span>
                   </a>
                   <a href="#!" class="dropdown-item">
                     <i class="ni ni-support-16"></i>
                     <span>Support</span>
-                  </a>
+                  </a> -->
                   <div class="dropdown-divider"></div>
-                  <a href="#!" class="dropdown-item">
+                  <a href="/logout" class="dropdown-item">
                     <i class="ni ni-user-run"></i>
                     <span>Logout</span>
                   </a>
@@ -669,7 +692,9 @@
                     <li class="breadcrumb-item">
                       <a href="#"><i class="fas fa-home"></i></a>
                     </li>
-                    <li class="breadcrumb-item"><a href="#">Dashboards</a></li>
+                    <li class="breadcrumb-item">
+                      <a href="dashboard">Dashboards</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">
                       Default
                     </li>
@@ -845,19 +870,22 @@
                     <h6 class="text-light text-uppercase ls-1 mb-1">
                       Overview
                     </h6>
-                    <h5 class="h3 text-white mb-0">Sales value</h5>
+                    <h5 class="h3 text-white mb-0">Meeting Chart</h5>
                   </div>
                   <div class="col">
                     <ul class="nav nav-pills justify-content-end">
+                      
+                       
                       <li
                         class="nav-item mr-2 mr-md-0"
                         data-toggle="chart"
                         data-target="#chart-sales-dark"
-                        data-update='{"data":{"datasets":[{"data":[0, 20, 10, 30, 15, 40, 20, 60, 60]}]}}'
-                        data-prefix="$"
-                        data-suffix="k"
+                        data-update='{"data":{"datasets":[{"data":<%= JSON.stringify(newData) %>}]}}'
+                        data-prefix=""
+                        data-suffix=""
                       >
                         <a
+                          id="monthlyGraph"
                           href="#"
                           class="nav-link py-2 px-3 active"
                           data-toggle="tab"
@@ -866,15 +894,19 @@
                           <span class="d-md-none">M</span>
                         </a>
                       </li>
+
                       <li
                         class="nav-item"
                         data-toggle="chart"
-                        data-target="#chart-sales-dark"
-                        data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}'
-                        data-prefix="$"
-                        data-suffix="k"
+                        data-target="#chart-sales-dark"     
+                        data-update='{"data":{"datasets":[{"data":<%= JSON.stringify(newData) %>}]}}'
+                        data-prefix=""
+                        data-suffix=""
                       >
+
+<!-- data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' -->
                         <a
+                          id="weeklyGraph"
                           href="#"
                           class="nav-link py-2 px-3"
                           data-toggle="tab"
