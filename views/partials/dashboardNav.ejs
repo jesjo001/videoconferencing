@@ -27,15 +27,52 @@
               <li class="nav-item">
                 <a class="nav-link active" href="/dashboard">
                   <i class="ni ni-tv-2 text-primary"></i>
-                  <span class="nav-link-text">Dashboard</span>
+                  <% if(active == "Dashboard" ) { %> 
+                    <span class="nav-link-text active">Dashboard</span>
+                  <% } else { %> 
+                    <span class="nav-link-text">Dashboard</span>
+                  <% } %> 
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/meetings">
+                <a class="nav-link" href="/meetings?page=1">
                   <i class="ni ni-bullet-list-67 text-yellow"></i>
-                  <span class="nav-link-text">Meetings</span>
+                  <% if(active == "Meetings" ) { %> 
+                    <span class="nav-link-text active">Meetings</span>
+                  <% } else { %> 
+                    <span class="nav-link-text">Meetings</span>
+                  <% } %> 
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/profile">
+                  <i class="ni ni-single-02 text-yellow"></i>
+
+                  <% if(active == "Profile" ) { %> 
+                    <span class="nav-link-text active">Profile</span>
+                  <% } else { %> 
+                    <span class="nav-link-text">Profile</span>
+                  <% } %> 
+
+                  
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="modal" data-target="#modal-default">
+                  <i
+                    class="fa fa-video-camera text-orange"
+                    aria-hidden="true"
+                    data-toggle="modal"
+                    data-target="#modal-default"
+                  ></i>
+                  <% if(active == "Schedule Meetings" ) { %> 
+                    <span class="nav-link-text active">Schedule Meetings</span>
+                  <% } else { %> 
+                    <span class="nav-link-text">Schedule Meetings</span>
+                  <% } %> 
+                </a>
+              </li>
+
               <li class="nav-item">
                 <a class="nav-link" href="examples/tables.html">
                   <i
@@ -44,29 +81,22 @@
                     data-bs-toggle="tooltip"
                     title="make calls"
                   ></i>
-                  <span class="nav-link-text">Calls</span>
+                  <% if(active == "Calls" ) { %> 
+                    <span class="nav-link-text active">Calls</span>
+                  <% } else { %> 
+                    <span class="nav-link-text">Calls</span>
+                  <% } %> 
                 </a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="examples/tables.html">
-                  <i
-                    class="fa fa-video-camera text-orange"
-                    aria-hidden="true"
-                  ></i>
 
-                  <span class="nav-link-text">Schedule Meetings</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="examples/profile.html">
-                  <i class="ni ni-single-02 text-yellow"></i>
-                  <span class="nav-link-text">Profile</span>
-                </a>
-              </li>
               <li class="nav-item">
                 <a class="nav-link" href="examples/tables.html">
                   <i class="ni ni-settings-gear-65 text-pink"></i>
-                  <span class="nav-link-text">Settings</span>
+                  <% if(active == "Settings" ) { %> 
+                    <span class="nav-link-text active">Settings</span>
+                  <% } else { %> 
+                    <span class="nav-link-text">Settings</span>
+                  <% } %>
                 </a>
               </li>
               <!-- <li class="nav-item">
@@ -162,6 +192,290 @@
                 </a>
               </li> -->
             </ul>
+
+            <div class="col-md-4">
+              <a href="/instant-meeting" class="btn btn-block btn-warning mb-3">Start a Meeting</a>
+              <div class="modal fade" id="modal-notification" tabindex="-1" role="dialog" aria-labelledby="modal-notification" aria-hidden="true">
+                <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+                  <div class="modal-content bg-gradient-danger">
+                    
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                          </button>
+                      </div>
+                      
+                      <div class="modal-body">                        
+                          <div class="py-1 text-center">
+                              <!-- <i class="ni ni-bell-55 ni-3x"></i> -->
+                              <h4 class="heading mt-1">Schedule a meeting!</h4>
+                              <p class="mx-4">You can schedule your meeting by just filling the form bellow.</p>
+                          </div>
+
+                          <div class="card-body px-lg-5 py-lg-5">
+                            <form role="form" action="/scheduleMeeting">
+                            <div class="form-group mb-3">
+                              <div
+                                class="
+                                  input-group input-group-merge input-group-alternative
+                                "
+                              >
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"
+                                    ><i class="ni ni-email-83"></i
+                                  ></span>
+                                </div>
+                                <input
+                                  class="form-control"
+                                  placeholder="Meeting Title"
+                                  type="text"
+                                  id="meetingTitle"
+                                />
+                              </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                              <div
+                                class="
+                                  input-group input-group-merge input-group-alternative
+                                "
+                              >
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"
+                                    ><i class="ni ni-email-83"></i
+                                  ></span>
+                                </div>
+                                <input
+                                  class="form-control"
+                                  placeholder="Brief info"
+                                  type="text"
+                                  id="info"
+                                />
+                              </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                              <div
+                                class="
+                                  input-group input-group-merge input-group-alternative
+                                "
+                              >
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"
+                                    ><i class="ni ni-email-83"></i
+                                  ></span>
+                                </div>
+                                <input
+                                  class="form-control"
+                                  placeholder="Meeting date"
+                                  type="date"
+                                  id="startdate"
+                                  name="meetingStart"
+                                  value="2018-07-22"
+                                  min="2021-01-01"
+                                  max="2030-12-31"
+                                />
+                              </div>
+                            </div>
+
+
+                              <div class="form-group mb-3">
+                                <div
+                                  class="
+                                    input-group input-group-merge input-group-alternative
+                                  "
+                                >
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text"
+                                      ><i class="ni ni-email-83"></i
+                                    ></span>
+                                  </div>
+                                  <input
+                                    class="form-control"
+                                    placeholder="Meeting time"
+                                    type="time"
+                                    id="meetingtime"
+                                    name="meetingTime"
+                                    min="00:00"
+                                    max="23:59"
+                                    required
+                                  />
+                                </div>
+                              </div>
+
+                              <div class="text-center">
+                              <button type="button" class="btn btn-lg btn-white my-4 ">
+                                Save
+                              </button>
+                            </div>
+                          </form>
+                          </div>
+                          
+                      </div>
+                      
+                      
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+
+          <div class="col-md-4">
+            <a
+              type="button" 
+              class="btn btn-block btn-primary mb-3 text-white"
+              data-toggle="modal"
+              data-target="#modal-default"
+            >
+              Schedule meeting
+          </a>
+            <div
+              class="modal fade"
+              id="modal-default"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="modal-default"
+              aria-hidden="true"
+            >
+              <div
+                class="modal-dialog modal- modal-dialog-centered modal-"
+                role="document"
+              >
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h6 class="modal-title" id="modal-title-default">
+                      Type your modal title
+                    </h6>
+                    <button
+                      type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+
+                  <form role="form" action="/scheduleMeeting" method="POST">
+                        <div class="modal-body">
+                        
+                          <div class="text-center px-lg-5 py-lg-5">
+                              <!-- <i class="ni ni-bell-55 ni-3x"></i> -->
+                              <h4 class="heading mt-4">Schedule a meeting!</h4>
+                              <p class="mx-4">You can schedule your meeting by just filling the form bellow.</p>
+                          </div>
+                        
+                          <div class="card-body px-lg-5 py-lg-5">
+                          
+                                <div class="form-group mb-3">
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text"
+                                        ><i class="ni ni-email-83"></i
+                                      ></span>
+                                    </div>
+                                    <input
+                                      class="form-control"
+                                      placeholder="Meeting Title"
+                                      type="text"
+                                      id="meetingTitle"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text"
+                                        ><i class="ni ni-email-83"></i
+                                      ></span>
+                                    </div>
+                                    <input
+                                      class="form-control"
+                                      placeholder="Brief info"
+                                      type="text"
+                                      id="info"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text"
+                                        ><i class="ni ni-email-83"></i
+                                      ></span>
+                                    </div>
+                                    <input
+                                      class="form-control"
+                                      placeholder="Meeting date"
+                                      type="date"
+                                      id="startdate"
+                                      name="meetingStart"
+                                      value="2018-07-22"
+                                      min="2021-01-01"
+                                      max="2030-12-31"
+                                    />
+                                  </div>
+                                </div>
+
+
+                                <div class="form-group mb-3">
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text"
+                                        ><i class="ni ni-email-83"></i
+                                      ></span>
+                                    </div>
+                                    <input
+                                      class="form-control"
+                                      placeholder="Meeting time"
+                                      type="time"
+                                      id="meetingtime"
+                                      name="meetingTime"
+                                      min="00:00"
+                                      max="23:59"
+                                      required
+                                    />
+                                  </div>
+                                </div>                            
+                          </div>             
+                      </div>
+                        
+
+                  <div class="modal-footer pb-lg-5 pb-lg-5 mx-4">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button
+                      type="button"
+                      class="btn btn-link ml-auto"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  </form> 
+                </div>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
       </div>

@@ -26,6 +26,10 @@ const meetingSchema = new Schema({
         type: String,
         require: false
     },
+    meetingLink: {
+        type: String,
+        require: false
+    },
 }, { timestamps: true });
 
 const Meeting = mongoose.model('Meeting', meetingSchema);

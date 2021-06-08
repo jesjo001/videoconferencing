@@ -144,6 +144,8 @@ app.get("/dashboard2", isLoggedIn, (req, res) => {
 
 app.get("/dashboard", isLoggedIn, async (req, res) => {
 
+    getWeeklyData()
+
     const total = await Meeting.countDocuments({ userId: req.user._id })
     const monthStart = moment().startOf('month');
     const monthEnd = moment().endOf('month');
@@ -153,13 +155,14 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
 
     const thisYearMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(yearStart), $lte: new Date(yearEnd) } })
     const amonthMeetings = await Meeting.count({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
-
     const upcomingMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(today) } })
     const monthlyMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+
+    //get graph data to display on dashboard
     let graphData = await getMonthlyData(req.user);
+    const weeklyData = await getWeeklyData(req.user._id);
 
     const weekNumber = moment().format("w");
-    console.log("weekNumber is " + weekNumber)
 
     Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
         .then((result) => {
@@ -183,7 +186,9 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
                     upcomingMeetingCount: upcomingMeeting.length,
 
                 },
-                newData: graphData
+                newData: graphData,
+                weeklyData
+
             })
         })
         .catch((err) => {
@@ -194,23 +199,38 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
 
 app.get("/meetings", isLoggedIn, async (req, res) => {
 
+    let page, search, totalMeetings, total;
+    let ITEMS_PER_PAGE = 10;
+
     console.log("requesr query is  ")
     console.log(req.query)
 
     if (req.query.search) {
-        console.log("search is active")
+        search = req.query.search
     }
+
+
 
     const monthStart = moment().startOf('month');
     const monthEnd = moment().endOf('month');
     const today = new Date()
     const upcomingMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(today) } })
     const monthlyMeeting = await Meeting.find({ userId: req.user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
+    if (req.query.page) {
+        page = +req.query.page || 1;
+        totalUpcomingMeetings = upcomingMeeting.length
+        console.log("upcoming meetings ", totalUpcomingMeetings)
 
-    const weekNumber = moment().format("w");
-    console.log("weekNumber is " + weekNumber)
+    }
 
     Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
+        .countDocuments()
+        .then(numMeetings => {
+            total = numMeetings;
+            return Meeting.find({ userId: req.user._id })
+                .skip((page - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
         .then((result) => {
             // console.log(result)
             console.log(req.user)
@@ -225,15 +245,59 @@ app.get("/meetings", isLoggedIn, async (req, res) => {
                 meetings: result,
                 upcomingMeeting,
                 monthlyMeeting,
+                currentPage: page,
+                hasNextPage: ITEMS_PER_PAGE * page < total,
+                hasPreviousPage: page > 1,
+                nextPage: page + 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(total / ITEMS_PER_PAGE)
             })
         })
         .catch((err) => {
             console.log(err)
         })
-    // res.render('dashboard', { title: "Dashboard" });
+})
+
+app.get("/profile", isLoggedIn, (req, res) => {
+    console.log(req.user)
+    res.render('profile', { title: "Profile", user: req.user, messageType: "Null", message: "" })
+})
+
+app.post("/update", isLoggedIn, async (req, res) => {
+
+    console.log(req.body)
+    try {
+        let userUpdate = { ...req.body }
+        console.log(req.user)
+        console.log("user update is ")
+        console.log(userUpdate)
+
+        const user = await User.updateOne({ _id: req.user.id }, {
+            $set:
+            {
+                username: userUpdate.username,
+                email: userUpdate.email,
+                firstName: userUpdate.firstName,
+                lastName: userUpdate.lastName,
+                address: userUpdate.address,
+                city: userUpdate.city,
+                country: userUpdate.country,
+                postalCode: userUpdate.postalCode
+            }
+        })
+
+        // console.log("new user is ", req.user)
+        res.render('profile', { title: "Profile", user: req.user, message: "Profile updated", messageType: "Success" })
+    } catch (e) {
+        console.log(e)
+        res.render('profile', { title: "Profile", user: req.user, message: "Error: something went wrong", messageType: "Error" })
+    }
+
+
 })
 
 app.get("/user/register", (req, res) => {
+
     res.render('user_register');
 })
 
@@ -295,21 +359,28 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/scheduleMeeting', isLoggedIn, (req, res) => {
+
     console.log(req.body)
-    console.log("requesr query is  ")
-    console.log(req.query)
-    let userId = req.user.id;
+    const userId = req.user.id;
     let meetDate = new Date(req.body.meetingStart);
-    let time = req.body.meetingTime.split(":")
-    meetDate.setHours(time[0], time[1])
+
+    // date and time together
+    const time = req.body.meetingTime.split(":")
+    meetDate.setHours(time[0], time[1]);
 
     console.log("user id is: ", userId)
+    //generate meeting link
+    const meetingId = uuidv4()
+
+    //generate new meeting object to be saved
+    // in the database
     const meeting = new Meeting({
         title: req.body.meetingTitle,
         briefInfo: req.body.briefInfo,
         startAt: meetDate,
         time: req.body.meetingTime,
-        userId: userId
+        userId: userId,
+        meetingLink: meetingId
     })
 
     meeting.save()
@@ -357,21 +428,7 @@ app.get('/setup', async (req, res) => {
     };
 
     bcrypt.genSalt(10, function (err, salt) {
-        if (err) return next(err);
-        bcrypt.hash("Pass12345!", salt, function (err, hash) {
-            if (err) return next(err);
-
-            const newAdmin = new User({
-                email: "admin@gmail.com",
-                password: hash,
-                username: "Josh",
-
-            });
-
-            newAdmin.save();
-
-            res.redirect('/user/login');
-        });
+        if (err) return negetWeeklyData
     });
 });
 
@@ -428,12 +485,34 @@ const getMonthlyData = async (user) => {
 
 }
 
-const getWeeklyData = async () => {
-    const weekStart = moment().startOf('week');
-    const weekEnd = moment().endOf('week');
-    const lastWeekBegins = moment().subtract(1, 'months').startOf('month')
-    const lastWeekEnds = moment().subtract(1, 'months').endOf('month')
-    const previousWeekBegins = moment().subtract(1, 'months').startOf('month')
-    const previousWeekEnds = moment().subtract(1, 'months').endOf('month')
+const getWeeklyData = async (userId) => {
+    const curr = new Date; // get current date
+    const first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+
+    const firstDay = new Date(curr.setDate(first)).toUTCString();
+    const secondDay = new Date(curr.setDate(first + 1)).toUTCString();
+    const thirdDay = new Date(curr.setDate(first + 2)).toUTCString();
+    const forthDay = new Date(curr.setDate(first + 3)).toUTCString();
+    const fifthDay = new Date(curr.setDate(first + 4)).toUTCString();
+    const sixthDay = new Date(curr.setDate(first + 5)).toUTCString();
+    const lastDay = new Date(curr.setDate(first + 6)).toUTCString();
+
+    const sundayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(firstDay).startOf('day')), $lte: new Date(moment(firstDay).endOf('day')) } })
+    const mondayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(secondDay).startOf('day')), $lte: new Date(moment(secondDay).endOf('day')) } })
+    const tuesdayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(thirdDay).startOf('day')), $lte: new Date(moment(thirdDay).endOf('day')) } })
+    const wednesdayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(forthDay).startOf('day')), $lte: new Date(moment(forthDay).endOf('day')) } })
+    const thursdayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(fifthDay).startOf('day')), $lte: new Date(moment(fifthDay).endOf('day')) } })
+    const fridayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(sixthDay).startOf('day')), $lte: new Date(moment(sixthDay).endOf('day')) } })
+    const saturdayMeeting = await Meeting.count({ userId: userId, startAt: { $gte: new Date(moment(lastDay).startOf('day')), $lte: new Date(moment(lastDay).endOf('day')) } })
+
+    return [
+        sundayMeeting,
+        mondayMeeting,
+        tuesdayMeeting,
+        wednesdayMeeting,
+        thursdayMeeting,
+        fridayMeeting,
+        saturdayMeeting
+    ]
 
 }
