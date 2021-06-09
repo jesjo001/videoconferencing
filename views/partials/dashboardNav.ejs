@@ -25,79 +25,85 @@
             <!-- Nav items -->
             <ul class="navbar-nav">
               <li class="nav-item">
+                <% if(active == "Dashboard" ) { %> 
                 <a class="nav-link active" href="/dashboard">
                   <i class="ni ni-tv-2 text-primary"></i>
-                  <% if(active == "Dashboard" ) { %> 
-                    <span class="nav-link-text active">Dashboard</span>
-                  <% } else { %> 
-                    <span class="nav-link-text">Dashboard</span>
-                  <% } %> 
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/meetings?page=1">
-                  <i class="ni ni-bullet-list-67 text-yellow"></i>
-                  <% if(active == "Meetings" ) { %> 
-                    <span class="nav-link-text active">Meetings</span>
-                  <% } else { %> 
-                    <span class="nav-link-text">Meetings</span>
-                  <% } %> 
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/profile">
-                  <i class="ni ni-single-02 text-yellow"></i>
-
-                  <% if(active == "Profile" ) { %> 
-                    <span class="nav-link-text active">Profile</span>
-                  <% } else { %> 
-                    <span class="nav-link-text">Profile</span>
-                  <% } %> 
-
                   
+                    <span class="nav-link-text active">Dashboard</span>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="modal" data-target="#modal-default">
-                  <i
-                    class="fa fa-video-camera text-orange"
-                    aria-hidden="true"
-                    data-toggle="modal"
-                    data-target="#modal-default"
-                  ></i>
-                  <% if(active == "Schedule Meetings" ) { %> 
-                    <span class="nav-link-text active">Schedule Meetings</span>
-                  <% } else { %> 
-                    <span class="nav-link-text">Schedule Meetings</span>
-                  <% } %> 
-                </a>
-              </li>
 
+                <% } else { %> 
+                <a class="nav-link" href="/dashboard">
+                  <i class="ni ni-tv-2 text-primary"></i>                  
+                    <span class="nav-link-text">Dashboard</span>
+                </a>
+                  <% } %> 
+
+              </li>
               <li class="nav-item">
-                <a class="nav-link" href="examples/tables.html">
+                 <% if(active === "Meetings" ) { %> 
+                <a class="nav-link active" href="/meetings?page=1">
+                  <i class="ni ni-bullet-list-67 text-yellow"></i>
+                    <span class="nav-link-text active">Meetings</span>   
+                </a>
+                <% } else { %> 
+                  <a class="nav-link" href="/meetings?page=1">
+                  <i class="ni ni-bullet-list-67 text-yellow"></i>
+                    <span class="nav-link-text">Meetings</span>   
+                </a>
+                    
+                  <% } %> 
+              </li>
+              <li class="nav-item">
+                <% if(active == "Profile" ) { %> 
+                <a class="nav-link active" href="/profile">
+                  <i class="ni ni-single-02 text-yellow"></i>            
+                    <span class="nav-link-text active">Profile</span> 
+                </a>
+                <% } else { %> 
+                  <a class="nav-link" href="/profile">
+                  <i class="ni ni-single-02 text-yellow"></i>            
+                    <span class="nav-link-text ">Profile</span> 
+                  </a>
+                  <% } %> 
+              </li>
+              
+              <li class="nav-item">
+                <% if(active == "Calls" ) { %>
+                <a class="nav-link active" href="examples/tables.html">
                   <i
                     class="fa fa-phone text-primary"
                     aria-hidden="true"
                     data-bs-toggle="tooltip"
                     title="make calls"
                   ></i>
-                  <% if(active == "Calls" ) { %> 
                     <span class="nav-link-text active">Calls</span>
-                  <% } else { %> 
-                    <span class="nav-link-text">Calls</span>
-                  <% } %> 
                 </a>
+                <% } else { %> 
+                  <a class="nav-link" href="examples/tables.html">
+                    <i
+                      class="fa fa-phone text-primary"
+                      aria-hidden="true"
+                      data-bs-toggle="tooltip"
+                      title="make calls"
+                    ></i>
+                      <span class="nav-link-text ">Calls</span>
+                  </a>
+                  <% } %> 
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="examples/tables.html">
+                <% if(active == "Settings" ) { %>
+                <a class="nav-link active" href="examples/tables.html">
                   <i class="ni ni-settings-gear-65 text-pink"></i>
-                  <% if(active == "Settings" ) { %> 
                     <span class="nav-link-text active">Settings</span>
-                  <% } else { %> 
-                    <span class="nav-link-text">Settings</span>
-                  <% } %>
                 </a>
+                <% } else { %> 
+                <a class="nav-link " href="examples/tables.html">
+                  <i class="ni ni-settings-gear-65 text-pink"></i>
+                    <span class="nav-link-text ">Settings</span>
+                </a>
+                <% } %>
               </li>
               <!-- <li class="nav-item">
                 <a class="nav-link" href="examples/icons.html">
@@ -230,6 +236,7 @@
                                   placeholder="Meeting Title"
                                   type="text"
                                   id="meetingTitle"
+                                  name="meetingTitle"
                                 />
                               </div>
                             </div>
@@ -377,14 +384,15 @@
                                   >
                                     <div class="input-group-prepend">
                                       <span class="input-group-text"
-                                        ><i class="ni ni-email-83"></i
-                                      ></span>
+                                        ><i class="fa fa-tag" aria-hidden="true"></i></span>
                                     </div>
                                     <input
                                       class="form-control"
                                       placeholder="Meeting Title"
                                       type="text"
                                       id="meetingTitle"
+                                      name="meetingTitle"
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -397,14 +405,15 @@
                                   >
                                     <div class="input-group-prepend">
                                       <span class="input-group-text"
-                                        ><i class="ni ni-email-83"></i
-                                      ></span>
+                                        ><i class="fa fa-comment" aria-hidden="true"></i></span>
                                     </div>
                                     <input
                                       class="form-control"
                                       placeholder="Brief info"
                                       type="text"
                                       id="info"
+                                      name="briefInfo"
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -417,8 +426,7 @@
                                   >
                                     <div class="input-group-prepend">
                                       <span class="input-group-text"
-                                        ><i class="ni ni-email-83"></i
-                                      ></span>
+                                        ><i class="fa fa-calendar" aria-hidden="true"></i></span>
                                     </div>
                                     <input
                                       class="form-control"
@@ -429,6 +437,7 @@
                                       value="2018-07-22"
                                       min="2021-01-01"
                                       max="2030-12-31"
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -442,8 +451,7 @@
                                   >
                                     <div class="input-group-prepend">
                                       <span class="input-group-text"
-                                        ><i class="ni ni-email-83"></i
-                                      ></span>
+                                        ><i class="fa fa-clock-o" aria-hidden="true"></i></span>
                                     </div>
                                     <input
                                       class="form-control"
@@ -456,7 +464,28 @@
                                       required
                                     />
                                   </div>
-                                </div>                            
+                                </div>           
+                                
+                                
+                                <div class="form-group mb-3">
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text"
+                                        ><i class="ni ni-email-83"></i
+                                      ></span>
+                                    </div>
+                                   
+                                    <select class="form-control" id="meetingType" aria-placeholder="Meeting Type"                                       id="meetingtime"
+                                      name="meetingType">
+                                      <option>Type</option>
+                                      <option>Video</option>
+                                      <option>Audio</option>
+                                    </select>
+                                </div> 
                           </div>             
                       </div>
                         

@@ -20,9 +20,10 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 //connect to db
+const port = process.env.port || 3030
 const dbURI = "mongodb://localhost:27017/creative-teams"
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((result) => server.listen(3030))
+    .then((result) => server.listen(port))
     .catch((err) => console.log(err))
 
 //Error
@@ -308,7 +309,7 @@ app.get("/user/login", isLoggedOut, (req, res) => {
 
 app.post('/register', async (req, res) => {
 
-    let numDoc = await User.count({ email: req.body.email })
+    let numDoc = await User.count({ email: req.body.signupEmail })
     console.log("number of old users with same email ", numDoc);
 
     if (numDoc == 0) {
@@ -320,8 +321,8 @@ app.post('/register', async (req, res) => {
             console.log(hashedPassword)
 
             const user = new User({
-                username: req.body.username,
-                email: req.body.email,
+                username: req.body.signupUsername,
+                email: req.body.signupEmail,
                 password: hashedPassword
             })
 
