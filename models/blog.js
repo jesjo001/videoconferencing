@@ -10,6 +10,18 @@ const userSchema = new Schema({
         type: String,
         require: true
     },
+    firstName: {
+        type: String,
+        require: false
+    },
+    postalCode: {
+        type: String,
+        require: false
+    },
+    lastName: {
+        type: String,
+        require: false
+    },
     password: {
         type: String,
         require: true
@@ -24,6 +36,14 @@ const userSchema = new Schema({
     },
     city: {
         type: String,
+        require: false
+    },
+    state: {
+        type: String,
+        require: false
+    },
+    phone: {
+        type: Number,
         require: false
     },
     country: {

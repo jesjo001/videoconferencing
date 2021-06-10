@@ -827,9 +827,7 @@ var BarsChart = (function () {
 	//
 	// Variables
 	//
-
 	var $chart = $('#chart-bars');
-
 
 	//
 	// Methods
@@ -838,20 +836,34 @@ var BarsChart = (function () {
 	// Init chart
 	function initChart($chart) {
 
-		let data = "<%= statistics.data %>";
-		console.log("data in graph ", data)
+		let data = weeklyData;
 
-		let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-		let currentMonth = new Date().getMonth()
+		const weeklyGraphData = data.map((i) => Number(i))
+		console.log("graph data in graph ", data)
+		console.log("numbers data in graph ", weeklyGraphData)
+		let months = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
 
 		// Create chart
 		var ordersChart = new Chart($chart, {
 			type: 'bar',
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							callback: function (value) {
+								if (!(value % 2)) {
+									return '' + value + '';
+								}
+							}
+						}
+					}]
+				}
+			},
 			data: {
-				labels: months.slice(currentMonth - 5).concat(months.slice(0, currentMonth + 1)),
+				labels: months,
 				datasets: [{
-					label: 'Sales',
-					data: [25, 20, 30, 22, 17, 29]
+					label: 'Weekly meetings',
+					data: weeklyGraphData
 				}]
 			}
 		});
@@ -885,11 +897,17 @@ var SalesChart = (function () {
 
 	function init($chart) {
 
-		// 
-		const chartData = newData2;
+		// get chart data from ejs front end 
+		let data = newData2
+		// CONVERT THE CHARTDATA STRING ARRAY TO ARRAY NUMBER
+		let chartData = data.map((i) => Number(i));
+		chartData = chartData.reverse()
 		console.log("newData in Chart", chartData);
 		let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		let currentMonth = new Date().getMonth()
+		console.log("Current ", currentMonth)
+		console.log("label ")
+		console.log(months.slice(currentMonth - 6).concat(months.slice(0, currentMonth + 1)))
 
 		var salesChart = new Chart($chart, {
 			type: 'line',
@@ -903,7 +921,7 @@ var SalesChart = (function () {
 						},
 						ticks: {
 							callback: function (value) {
-								if (!(value % 10)) {
+								if (!(value % 2)) {
 									return '' + value + '';
 								}
 							}
@@ -937,7 +955,6 @@ var SalesChart = (function () {
 		});
 
 		// Save to jQuery object
-
 		$chart.data('chart', salesChart);
 
 	};
@@ -962,7 +979,6 @@ var Datepicker = (function () {
 	// Variables
 
 	var $datepicker = $('.datepicker');
-
 
 	// Methods
 
