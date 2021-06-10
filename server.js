@@ -56,7 +56,7 @@ function isLoggedIn(req, res, next) {
 
 function isLoggedOut(req, res, next) {
     if (!req.isAuthenticated()) return next();
-    res.redirect('/welcome')
+    res.redirect('/dashboard')
 }
 
 passport.serializeUser(function (user, done) {
