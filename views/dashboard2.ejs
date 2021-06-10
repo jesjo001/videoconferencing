@@ -407,7 +407,7 @@
                     <% }) %> <% } else { %>
                     <td>
                       No scheduled upcoming meetings, click to schedule
-                      <a href="#!" class="btn btn-sm btn-primary">Schedule</a>
+                      <a href="#" data-toggle="modal" data-target="#modal-default" class="btn btn-sm btn-primary">Schedule</a>
                     </td>
                     <% } %>
                   </tbody>
@@ -446,7 +446,7 @@
                       <td><%= meeting.time %></td>
                     </tr>
                     <% }) %> <% } else { %>
-                    <td>No scheduled meetings this month.</td>
+                    <td>No scheduled meetings this month. <a href="#" data-toggle="modal" data-target="#modal-default" class="btn btn-sm btn-primary">Schedule</a></td>
                     <% } %>
                   </tbody>
                 </table>
