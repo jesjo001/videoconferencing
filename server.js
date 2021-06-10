@@ -407,7 +407,7 @@ app.post('/scheduleMeeting', isLoggedIn, (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/welcome',
+    successRedirect: '/dashboard',
     failureRedirect: '/user/login?error=true'
 }))
 
