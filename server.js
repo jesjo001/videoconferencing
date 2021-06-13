@@ -455,7 +455,13 @@ app.post('/forgotten-password', async (req, res) => {
         //generate a token with secret nd payload expires in 15 min
         //send token to user email. 
         const token = jwt.sign(payload, secret, { expiresIn: '15m' })
-        const link = `${process.env.HOST}${process.env.PORT}/reset-password/${user._id}/${token}`
+
+        //Uncomment section for local testing 
+        // const link = `${process.env.HOST}${process.env.PORT}/reset-password/${user._id}/${token}`
+
+        //COMMENT FR LOCAL TESTING
+        const link = `${process.env.HEROKUHOST}/reset-password/${user._id}/${token}`
+
         console.log(link)
         //Send Email
         let content = `<h3>Creative Teams </h3> <br / > <h4> Reset Password</h4> <p>Yoe can now reset your password by following the link bellow <br/> ${link} </p>`
