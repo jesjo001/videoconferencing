@@ -6,6 +6,7 @@ let peer = new Peer(undefined, {
     port: '443'
 })
 
+let newUser = username;
 let myVideoStream
 const myVideo = document.createElement('video')
 myVideo.muted = true;
@@ -43,7 +44,7 @@ navigator.mediaDevices.getUserMedia({
 
     socket.on('createMessage', message => {
         console.log("new message is ", message)
-        $('ul').append(`<li class="message"><b>user</b><br/>${message} </li>`)
+        $('ul').append(`<li class="message"><b>${newUser}</b><br/>${message} </li>`)
         scrollToButtom()
     })
 })

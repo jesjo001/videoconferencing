@@ -33,6 +33,8 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 //Error
 let error = [];
 let newError = false;
+let loggedIn = false;
+let username = "user";
 
 //Middlewares
 app.set('view engine', 'ejs');
@@ -148,6 +150,7 @@ app.get("/dashboard2", isLoggedIn, (req, res) => {
 })
 
 app.get("/dashboard", isLoggedIn, async (req, res) => {
+    loggedIn = true;
 
     getWeeklyData()
 
@@ -172,6 +175,7 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
     Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
         .then((result) => {
             // console.log(result)
+            username = req.user.username
             console.log(req.user)
             res.render('dashboard2', {
                 title: "Dashboard",
@@ -415,6 +419,7 @@ app.post('/login', passport.authenticate('local', {
 }))
 
 app.get('/logout', function (req, res) {
+    loggedIn = false;
     req.logout();
     res.redirect('/');
 })
@@ -580,7 +585,7 @@ app.get("/instant-meeting", (req, res) => {
 
 app.get('/:room', (req, res) => {
     // console.log("room Id ", req.params.room)
-    res.render('room', { roomId: req.params.room, title: "Room" })
+    res.render('room', { roomId: req.params.room, title: "Room", username })
 })
 
 
