@@ -583,7 +583,15 @@ app.get("/instant-meeting", (req, res) => {
     res.redirect(`/${meetingId}`);
 })
 
+app.post("/instant-meeting/user", (req, res) => {
+    console.log(req.body.username)
+    username = req.body.username;
+    res.redirect(`/instant-meeting`);
+})
+
 app.get('/:room', (req, res) => {
+    // console.log("in room ")
+    // console.log("username is ", username)
     // console.log("room Id ", req.params.room)
     res.render('room', { roomId: req.params.room, title: "Room", username })
 })

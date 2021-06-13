@@ -7,6 +7,7 @@ let peer = new Peer(undefined, {
 })
 
 let newUser = username;
+
 let myVideoStream
 const myVideo = document.createElement('video')
 myVideo.muted = true;
