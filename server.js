@@ -18,6 +18,9 @@ const moment = require('moment');
 const { response } = require('express');
 const jwt = require("jsonwebtoken")
 const { sendMail } = require("./modules/mailer")
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const peerServer = ExpressPeerServer(server, {
     debug: true
@@ -277,6 +280,7 @@ app.post("/update", isLoggedIn, async (req, res) => {
     console.log(req.body)
     try {
         let userUpdate = { ...req.body }
+        let dob = new Date(req.body.yearOfBirth);
         console.log(req.user)
         console.log("user update is ")
         console.log(userUpdate)
@@ -291,7 +295,10 @@ app.post("/update", isLoggedIn, async (req, res) => {
                 address: userUpdate.address,
                 city: userUpdate.city,
                 country: userUpdate.country,
-                postalCode: userUpdate.postalCode
+                postalCode: userUpdate.postalCode,
+                sex: userUpdate.sex,
+                dob: dob
+
             }
         })
 
@@ -578,6 +585,51 @@ app.get('/setup', async (req, res) => {
     });
 });
 
+const handleError = (err, res) => {
+    res.render('profile', { title: "Profile", user: req.user, messageType: "Error", message: "" })
+};
+
+var upload = multer({ dest: './public/data/uploads/' })
+
+app.get("/profileImg.jpg", (req, res) => {
+    res.sendFile(path.join(__dirname, "./uploads/profileImg.jpg"));
+});
+
+app.post("/upload", upload.single("file" /* name attribute of <file> element in your form */), (req, res) => {
+    const tempPath = req.file.path;
+    const targetPath = path.join(__dirname, "./uploads/profileImg.jpg");
+
+    if (path.extname(req.file.originalname).toLowerCase() === ".jpg") {
+        fs.rename(tempPath, targetPath, err => {
+            if (err) {
+                console.log("Erroe is ", error)
+                return handleError(err, res);
+            }
+
+            // res
+            //     .status(200)
+            //     .contentType("text/plain")
+            //     .end("File uploaded!");
+            res.render('profile', {
+                title: "Profile",
+                user: req.user,
+                messageType: "Success",
+                message: "File uploaded!"
+            })
+        });
+    } else {
+        fs.unlink(tempPath, err => {
+            res.render('profile', {
+                title: "Profile",
+                user: req.user,
+                messageType: "Error Message",
+                message: "Only .jpg files are allowed!"
+            })
+        });
+    }
+}
+);
+
 app.get("/instant-meeting", (req, res) => {
     let meetingId = uuidv4()
     res.redirect(`/${meetingId}`);
@@ -591,8 +643,6 @@ app.post("/instant-meeting/user", (req, res) => {
 
 app.get('/:room', (req, res) => {
     // console.log("in room ")
-    // console.log("username is ", username)
-    // console.log("room Id ", req.params.room)
     res.render('room', { roomId: req.params.room, title: "Room", username })
 })
 
@@ -615,9 +665,6 @@ const getMonthlyData = async (user) => {
     const fiveMonthBackEnds = moment().subtract(5, 'months').endOf('month')
     const sixMonthBackBegins = moment().subtract(6, 'months').startOf('month')
     const sixMonthBackEnds = moment().subtract(6, 'months').endOf('month')
-    const sevenMonthBackBegins = moment().subtract(7, 'months').startOf('month')
-    const sevenMonthBackEnds = moment().subtract(7, 'months').endOf('month')
-
 
     const monthlyMeeting = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
     const lastMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(lastMonthBegins), $lte: new Date(lastMonthEnds) } })

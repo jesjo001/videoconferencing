@@ -30,6 +30,10 @@ const userSchema = new Schema({
         type: Date,
         require: false
     },
+    sex: {
+        type: String,
+        require: false
+    },
     address: {
         type: String,
         require: false
