@@ -20,9 +20,10 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 //connect to db
+const port = process.env.port || 3030
 const dbURI = "mongodb://localhost:27017/creative-teams"
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((result) => server.listen(3030))
+    .then((result) => server.listen(port))
     .catch((err) => console.log(err))
 
 //Error
