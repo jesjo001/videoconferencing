@@ -308,7 +308,7 @@ app.get("/user/login", isLoggedOut, (req, res) => {
 
 app.post('/register', async (req, res) => {
 
-    let numDoc = await User.count({ email: req.body.email })
+    let numDoc = await User.count({ email: req.body.signupEmail })
     console.log("number of old users with same email ", numDoc);
 
     if (numDoc == 0) {
@@ -320,8 +320,8 @@ app.post('/register', async (req, res) => {
             console.log(hashedPassword)
 
             const user = new User({
-                username: req.body.username,
-                email: req.body.email,
+                username: req.body.signupUsername,
+                email: req.body.signupEmail,
                 password: hashedPassword
             })
 

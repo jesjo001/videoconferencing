@@ -841,16 +841,29 @@ var BarsChart = (function () {
 		const weeklyGraphData = data.map((i) => Number(i))
 		console.log("graph data in graph ", data)
 		console.log("numbers data in graph ", weeklyGraphData)
-		let months = ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"];
+		let months = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
 
 		// Create chart
 		var ordersChart = new Chart($chart, {
 			type: 'bar',
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							callback: function (value) {
+								if (!(value % 2)) {
+									return '' + value + '';
+								}
+							}
+						}
+					}]
+				}
+			},
 			data: {
 				labels: months,
 				datasets: [{
-					label: 'Sales',
-					data: [1, 2, 3, 2, 10, 5]
+					label: 'Weekly meetings',
+					data: weeklyGraphData
 				}]
 			}
 		});
@@ -887,8 +900,8 @@ var SalesChart = (function () {
 		// get chart data from ejs front end 
 		let data = newData2
 		// CONVERT THE CHARTDATA STRING ARRAY TO ARRAY NUMBER
-		const chartData = data.map((i) => Number(i));
-
+		let chartData = data.map((i) => Number(i));
+		chartData = chartData.reverse()
 		console.log("newData in Chart", chartData);
 		let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		let currentMonth = new Date().getMonth()
