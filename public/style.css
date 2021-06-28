@@ -9,10 +9,6 @@
   flex-direction: column;
 }
 
-.main_right {
-  flex: 0.2;
-}
-
 .main_videos {
   flex-grow: 1;
   background-color: black;
@@ -26,11 +22,6 @@
   background-color: #1c1e20;
 }
 
-.main_right {
-  background-color: #242324;
-  border-left: 1px solid #3d3d42;
-}
-
 .main_controls {
   color: #d2d2d2;
   display: flex;
@@ -40,6 +31,7 @@
 
 .main_controls_block {
   display: flex;
+  min-height: 60px;
 }
 
 .main_controls_button {
@@ -47,8 +39,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 8px 10px;
-  min-width: 80px;
+  padding: 8px 8px;
+  min-width: 70px;
   cursor: pointer;
 }
 
@@ -63,7 +55,10 @@
 
 .main_right {
   display: flex;
+  flex: 0.2;
   flex-direction: column;
+  background-color: #242324;
+  border-left: 1px solid #3d3d42;
 }
 
 .main_header {

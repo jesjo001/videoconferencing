@@ -118,17 +118,19 @@ const playStop = () => {
 }
 
 const setMuteButton = () => {
+    //unmute
     const html = `
         <i class="unmute fas fa-microphone-slash"></i>
-        <span>Unmute</span>        
+        <span></span>        
     `
     document.querySelector('.main_mute_button').innerHTML = html;
 }
 
 const setUnmuteButton = () => {
+    //Mute
     const html = `
     <i class="fas fa-microphone"></i>
-    <span>Mute</span>
+    <span></span>
   `
     document.querySelector('.main_mute_button').innerHTML = html;
 }
@@ -137,17 +139,42 @@ const setUnmuteButton = () => {
 
 
 const setStopVideo = () => {
+    //Show Video
     const html = `
   <i class="stop fas fa-video-slash"></i>
-    <span>Play Video</span>
+    <span></span>
   `
     document.querySelector('.main_video_button').innerHTML = html;
 }
 
 const setPlayVideoIcon = () => {
+    //Stop video
     const html = `
     <i class="fas fa-video"></i>
-    <span>Stop Video</span>
+    <span></span>
   `
     document.querySelector('.main_video_button').innerHTML = html;
+}
+
+
+const hideChat = () => {
+    let chatWindow = document.querySelector(".main_right")
+    let mainLeftWindow = document.querySelector(".main_left")
+    let mainChatWindow = document.querySelector(".main_chat_window")
+    let mainMessageContainer = document.querySelector(".main_message_container")
+    let messageInput = document.querySelector(".main_message_container input")
+
+    if (chatWindow.style.display == 'none') {
+        mainLeftWindow.style.cssText += 'flex: 0.8; display: flex; flex-direction: column;'
+        chatWindow.style.cssText += 'display: flex; flex: 0.2 '
+        mainChatWindow.style.cssText = 'flex-grow: 1; overflow-y: auto;'
+        //messageInput.style.cssText = 'flex-grow: 1; background-color: transparent; border: none; color: #f5f5f5;'
+
+    } else {
+        mainLeftWindow.style.cssText = 'flex: 1; display: flex; flex-direction: column;'
+        chatWindow.style.cssText += 'flex: 0; display: none'
+    }
+
+
+
 }
