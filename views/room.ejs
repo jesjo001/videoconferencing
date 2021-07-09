@@ -61,6 +61,7 @@
         <div class="main_controls">
           <div class="main_controls_block">
             <div
+              data-toggle="tooltip" data-placement="top" title="Mute/Unmute"
               onclick="muteUnmute()"
               class="main_controls_button main_mute_button"
             >
@@ -68,6 +69,7 @@
               <span></span>
             </div>
             <div
+              data-toggle="tooltip" data-placement="top" title="Play/Pause Video"
               onclick="playStop()"
               class="main_controls_button main_video_button"
             >
@@ -77,18 +79,19 @@
           </div>
 
           <div class="main_controls_block">
-            <div class="main_controls_button">
+            <div class="main_controls_button" data-toggle="tooltip" data-placement="top" title="Participants">
               <i class="fas fa-user-friends"></i>
             </div>
-            <div class="main_controls_button">
+            <div class="main_controls_button" data-toggle="tooltip" data-placement="top" title="Settings">
               <i class="fas fa-shield-alt"></i>
             </div>
-            <div class="main_controls_button" onclick="hideChat()">
+            <div class="main_controls_button comment" onclick="hideChat()" data-toggle="tooltip" data-placement="top" title="Toggle Chat">
               <i class="fas fa-comment-alt"></i>
             </div>
           </div>
+
           <div class="main_controls_block">
-            <div class="main_controls_button">
+            <div class="main_controls_button" data-toggle="tooltip" data-placement="top" title="Exit">
               <span class="leave_meeting"
                 ><a href="/" style="text-decoration: none; color: lightpink"
                   ><i class="fa fa-power-off" aria-hidden="true"></i></a
