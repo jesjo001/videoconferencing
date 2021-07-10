@@ -38,6 +38,7 @@ let error = [];
 let newError = false;
 let loggedIn = false;
 let username = "user";
+let userEmail = "NIL";
 
 //Middlewares
 app.set('view engine', 'ejs');
@@ -638,12 +639,13 @@ app.get("/instant-meeting", (req, res) => {
 app.post("/instant-meeting/user", (req, res) => {
     console.log(req.body.username)
     username = req.body.username;
+    userEmail = req.body.useremail;
     res.redirect(`/instant-meeting`);
 })
 
 app.get('/:room', (req, res) => {
     // console.log("in room ")
-    res.render('room', { roomId: req.params.room, title: "Room", username })
+    res.render('room', { roomId: req.params.room, title: "Room", username, userEmail })
 })
 
 

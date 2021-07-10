@@ -4,7 +4,7 @@
 }
 
 .main_left {
-  flex: 0.8;
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -54,11 +54,41 @@
 }
 
 .main_right {
-  display: flex;
+  display: none;
+  flex: 0.2;
+  flex-direction: column;
+  background-color: rgb(0, 0, 0);
+  opacity: 0.85;
+  border-left: 1px solid #3d3d42;
+}
+
+.main_right_users {
+  display: none;
   flex: 0.2;
   flex-direction: column;
   background-color: #242324;
   border-left: 1px solid #3d3d42;
+}
+
+.user_list {
+  width: 80%;
+  height: 70px;
+  background-color: rgba(84, 84, 84, 0.5);
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px 6px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.user_list:hover {
+  box-shadow: 7px 6px 14px -2px rgba(0, 0, 0, 0.85);
+  -webkit-box-shadow: 7px 6px 14px -2px rgba(0, 0, 0, 0.85);
+  -moz-box-shadow: 7px 6px 14px -2px rgba(0, 0, 0, 0.85);
+  -moz-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -o-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .main_header {
@@ -68,6 +98,11 @@
 }
 
 .main_chat_window {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.main_users_window {
   flex-grow: 1;
   overflow-y: auto;
 }
