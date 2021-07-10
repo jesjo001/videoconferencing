@@ -176,7 +176,7 @@ const setPlayVideoIcon = () => {
 
 const hideChat = () => {
 
-    let html = `<i class="fa fa-comments" aria-hidden="true"></i>`
+    let html = `<i class="fas fa-comment-alt" aria-hidden="true"></i>`
     let userHtml = '<i class="fas fa-user-friends" aria-hidden="true"></i>';
 
     let chatWindow = document.querySelector(".main_right")
@@ -194,7 +194,7 @@ const hideChat = () => {
         chatWindow.style.cssText = 'display: flex; flex: 0.2 '
         mainLeftWindow.style.cssText = 'flex: 0.8; display: flex; flex-direction: column;'
 
-        html = `<i class="fas fa-comment-alt"></i>`;
+        html = `<i class="fas fa-comment-alt stop"></i>`;
         document.querySelector('.comment').innerHTML = html;
         document.querySelector(".users").innerHTML = userHtml;
     } else {
@@ -209,7 +209,7 @@ const hideChat = () => {
 const toogleUsers = () => {
 
     let html = '<i class="fas fa-user-friends" aria-hidden="true"></i>';
-    let chatHtml = '<i class="fa fa-comments" aria-hidden="true"></i>'
+    let chatHtml = '<i class="fas fa-comment-alt" aria-hidden="true"></i>'
 
     let chatWindow = document.querySelector(".main_right")
     let mainLeftWindow = document.querySelector(".main_left")
@@ -227,7 +227,7 @@ const toogleUsers = () => {
         userWindow.style.cssText = 'display: flex; '
         mainLeftWindow.style.cssText = 'flex: 0.8; display: flex; flex-direction: column;'
 
-        html = `<i class="fas fa-user-friends" style="color: red;"></i>`;
+        html = `<i class="fas fa-user-friends stop"></i>`;
         document.querySelector('.users').innerHTML = html;
         document.querySelector('.comment').innerHTML = chatHtml;
 
