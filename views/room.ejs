@@ -50,7 +50,7 @@
         height: 300px;
         width: 400px;
         object-fit: cover;
-        padding: 8px;
+
         border-radius: 20px;
       }
 
@@ -58,12 +58,13 @@
         height: 300px;
         width: 400px;
         object-fit: cover;
-        padding: 8px;
+
         border-radius: 20px;
 
-        box-shadow: -2px -1px 31px -7px rgba(56,56,56,0.7);
-        -webkit-box-shadow: -2px -1px 31px -7px rgba(56,56,56,0.7);
-        -moz-box-shadow: -2px -1px 31px -7px rgba(56,56,56,0.7);
+
+        box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ; 
+        -webkit-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ; 
+        -moz-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ; 
         -moz-transform: scale(1.1);
         -webkit-transform: scale(1.1);
         -o-transform: scale(1.1);
@@ -138,12 +139,15 @@
 
       <div class="main_right_users" id="userArea" style="display:none">
         <div class="main_header">
-          <h6>Users</h6>
+          <h6 class="title text-white-50">Users online</h6>
+          
         </div>
 
         <div class="main_users_window">
           <ul class="messages userArea" id="userAreas">
-            <!-- <li class="user_list">user 1</li> -->
+            <span class="title">
+              <!-- <li class="user_list">user 1</li> -->
+            </span>
           </ul>
         </div>
       </div>

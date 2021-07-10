@@ -11,7 +11,7 @@
 
 .main_videos {
   flex-grow: 1;
-  background-color: black;
+  background-color: rgb(27, 27, 27);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -27,6 +27,11 @@
   display: flex;
   justify-content: space-between;
   padding: 5px;
+}
+
+.title {
+  border-bottom: 1px solid #585858;
+  height: 25px;
 }
 
 .main_controls_block {
@@ -71,7 +76,7 @@
 }
 
 .user_list {
-  width: 80%;
+  width: 90%;
   height: 70px;
   background-color: rgba(84, 84, 84, 0.5);
   color: rgba(255, 255, 255, 0.5);
