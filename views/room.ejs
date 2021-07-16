@@ -44,32 +44,36 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        
+        /* under testing section */
+        flex-direction:row;
+
       }
       video {
-        height: 300px;
-        width: 400px;
+        max-height: 300px;
+        max-width: 400px;
+        padding: 8px;
+        border-radius: 20px;
+        /* under testing */
+        flex:1 1 auto;
+        /* End testing section */
         object-fit: cover;
 
-        border-radius: 20px;
       }
 
       video:hover {
-        height: 300px;
-        width: 400px;
         object-fit: cover;
-
+        padding: 8px;
         border-radius: 20px;
 
 
-        box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ; 
-        -webkit-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ; 
-        -moz-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ; 
-        -moz-transform: scale(1.1);
-        -webkit-transform: scale(1.1);
-        -o-transform: scale(1.1);
-        -ms-transform: scale(1.1);
-        transform: scale(1.1);
+        box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ;
+        -webkit-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ;
+        -moz-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ;
+        -moz-transform: scale(1.3);
+        -webkit-transform: scale(1.3);
+        -o-transform: scale(1.3);
+        -ms-transform: scale(1.3);
+        transform: scale(1.3);
       }
     </style>
   </head>
@@ -104,7 +108,7 @@
             <div class="main_controls_button users" onclick="toogleUsers()" data-toggle="tooltip" data-placement="top" title="Participants">
               <i class="fas fa-user-friends"></i>
             </div>
-            <div class="main_controls_button" data-toggle="tooltip" data-placement="top" title="Settings">
+            <div class="main_controls_button settings" data-toggle="tooltip" onclick="toggleSettings()" data-placement="top" title="Settings">
               <i class="fas fa-shield-alt"></i>
             </div>
             <div class="main_controls_button comment" onclick="hideChat()" data-toggle="tooltip" data-placement="top" title="Toggle Chat">
@@ -137,10 +141,10 @@
         </div>
       </div>
 
-      <div class="main_right_users" id="userArea" style="display:none">
+      <div class="main_right_users" id="userArea" style="display:none;">
         <div class="main_header">
           <h6 class="title text-white-50">Users online</h6>
-          
+
         </div>
 
         <div class="main_users_window">
@@ -148,6 +152,76 @@
             <span class="title">
               <!-- <li class="user_list">user 1</li> -->
             </span>
+          </ul>
+        </div>
+      </div>
+
+      <div class="main_right_settings" id="settingsMainArea" style="display:none;">
+        <div class="main_header">
+          <h6 class="title text-white-50">Settings</h6>
+
+        </div>
+
+        <div class="main_users_window">
+
+          <ul class="settingsPanel settingsArea" >
+            <form>
+              <div class="form-group mb-3">
+                <label for="formGroupExampleInput">Example label</label>
+                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+              </div>
+              <div class="form-group mb-3">
+                <div class="">
+                  <label for="inputState" id="formLabels">Send Video Resolution </label>
+                <select id="sendVideoResolution" class="form-select inputState" onClick="changeVideoSettings()">
+                  <option selected>Choose...</option>
+                  <option value="240">240p </option>
+                  <option value="360">360p </option>
+                  <option value="480">480p </option>
+                  <option value="720">720p </option>
+                  <option value="1080">1080p </option>
+                </select>
+                </div>
+
+              </div>
+
+              <div class="form-group mb-3">
+                <div class="">
+                  <label for="inputState" id="formLabels">Receive Video Resolution </label>
+                  <select id="receiveVideoRes" class="form-select inputState" id="formDropDown">
+                  <option selected>Choose...</option>
+                  <option value="360">360p </option>
+                  <option value="480">480p </option>
+                  <option value="720">720p </option>
+                  <option value="1080">1080p </option>
+                </select>
+                </div>
+
+              </div>
+
+              <div class="form-group mb-3" id="formContainer">
+                <div class="">
+                  <div class="custom-control custom-switch">
+                    <label class="custom-control-label " for="customSwitch1" id="formLabels">Stop incoming videos</label>
+                    <input type="checkbox" class="custom-control-input ml-3" id="usersVideoToggle" onclick="stopUsersVideo()">
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-3" id="formContainer">
+                <div class="">
+                  <div class="custom-control custom-switch">
+                    <label class="custom-control-label " for="customSwitch1" id="formLabels">Stop my videos</label>
+                    <input type="checkbox" class="custom-control-input ml-3" id="customSwitch1" onclick="playStop()">
+
+                  </div>
+                </div>
+              </div>
+            </form>
+            <l>
+
+            </l>
           </ul>
         </div>
       </div>
@@ -196,13 +270,13 @@
 
                   <form role="form" action="/instant-meeting/user" method="POST">
                         <div class="modal-body">
-                        
+
                           <div class="px-lg-5 py-lg-0">
                               <!-- <i class="ni ni-bell-55 ni-3x"></i> -->
                               <h4 class="heading ">Enter your email to join meeting</h4>
                               <!-- <p class="mx-5">You can schedule your meeting by filling the form bellow.</p> -->
                           </div>
-                        
+
                           <div class="card-body px-lg-5 py-lg-2" style="border-bottom: none;">
                                 <div class="form-group mb-3" >
                                   <div
@@ -217,10 +291,10 @@
                                         id="username"
                                         name="username"
                                         required
-                                      />                                    
+                                      />
                                   </div>
-                                </div> 
-                                
+                                </div>
+
                                 <div class="form-group mb-3">
                                   <div
                                     class="
@@ -236,17 +310,17 @@
                                       required
                                     />
                                   </div>
-                                  
+
                                 </div>
                           </div>
-                        
+
 
                   <div class="modal-footer  px-lg-5 py-lg-0" style="border-top: none;">
                     <button type="submit" class="btn btn-primary">Join Meeting</button>
-                    
+
                   </div>
                   </div>
-                  </form> 
+                  </form>
                 </div>
               </div>
             </div>
@@ -262,8 +336,8 @@
 
     let username = "<%=username%>"
    let userEmail  = "<%=userEmail%>"
-      
-      
+
+
     </script>
   </body>
 </html>
