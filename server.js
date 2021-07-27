@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+require('dotenv').config()
 //
 const bcrypt = require('bcrypt')
 const server = require('http').Server(app);
@@ -14,14 +15,20 @@ const session = require('express-session')
 const morgan = require('morgan')
 const mongoose = require('mongoose');
 const moment = require('moment');
+const { response } = require('express');
+const jwt = require("jsonwebtoken")
+const { sendMail } = require("./modules/mailer")
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const peerServer = ExpressPeerServer(server, {
     debug: true
 });
 
 //connect to db
-const port = process.env.port || 3030
-const dbURI = "mongodb://localhost:27017/creative-teams"
+const port = process.env.PORT || 3030
+const dbURI = process.env.MONGODBURI
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then((result) => server.listen(port))
     .catch((err) => console.log(err))
@@ -29,6 +36,9 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 //Error
 let error = [];
 let newError = false;
+let loggedIn = false;
+let username = "user";
+let userEmail = "NIL";
 
 //Middlewares
 app.set('view engine', 'ejs');
@@ -55,7 +65,7 @@ function isLoggedIn(req, res, next) {
 
 function isLoggedOut(req, res, next) {
     if (!req.isAuthenticated()) return next();
-    res.redirect('/welcome')
+    res.redirect('/dashboard')
 }
 
 passport.serializeUser(function (user, done) {
@@ -144,6 +154,7 @@ app.get("/dashboard2", isLoggedIn, (req, res) => {
 })
 
 app.get("/dashboard", isLoggedIn, async (req, res) => {
+    loggedIn = true;
 
     getWeeklyData()
 
@@ -168,6 +179,7 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
     Meeting.find({ userId: req.user._id }).sort({ createdAt: -1 })
         .then((result) => {
             // console.log(result)
+            username = req.user.username
             console.log(req.user)
             res.render('dashboard2', {
                 title: "Dashboard",
@@ -269,6 +281,7 @@ app.post("/update", isLoggedIn, async (req, res) => {
     console.log(req.body)
     try {
         let userUpdate = { ...req.body }
+        let dob = new Date(req.body.yearOfBirth);
         console.log(req.user)
         console.log("user update is ")
         console.log(userUpdate)
@@ -283,7 +296,10 @@ app.post("/update", isLoggedIn, async (req, res) => {
                 address: userUpdate.address,
                 city: userUpdate.city,
                 country: userUpdate.country,
-                postalCode: userUpdate.postalCode
+                postalCode: userUpdate.postalCode,
+                sex: userUpdate.sex,
+                dob: dob
+
             }
         })
 
@@ -406,18 +422,155 @@ app.post('/scheduleMeeting', isLoggedIn, (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/welcome',
+    successRedirect: '/dashboard',
     failureRedirect: '/user/login?error=true'
 }))
 
 app.get('/logout', function (req, res) {
+    loggedIn = false;
     req.logout();
     res.redirect('/');
 })
 
-app.get('/newView', function (req, res) {
-    res.render('newView');
+
+//RESET PASSWORD / FORGOTEN PASSWORD SECTION
+
+app.get('/forgotten-password', function (req, res) {
+    res.render('forgottenPassword', { messageType: "Null", message: "" })
 })
+
+app.post('/forgotten-password', async (req, res) => {
+    ///get email from request body
+    const { email } = req.body
+
+    //check if email exists in db
+    //if not send a message to usser
+    const exists = await User.exists({ email });
+    if (!exists) {
+        console.log("doesnt exist")
+        res.render("forgottenPassword", { message: "Email does not exist in our database", messageType: "Error" })
+        return;
+    }
+
+    //if user exist, proceed
+    if (exists) {
+
+        //get user from db
+        const user = await User.findOne({ email })
+        console.log(user)
+
+        //generate a secret and payload to use to generate a token 
+        const secret = process.env.JWT_SECET + user.password
+        const payload = {
+            email: user.email,
+            id: user._id
+        }
+        //generate a token with secret nd payload expires in 15 min
+        //send token to user email. 
+        const token = jwt.sign(payload, secret, { expiresIn: '15m' })
+
+        //Uncomment section for local testing 
+        // const link = `${process.env.HOST}${process.env.PORT}/reset-password/${user._id}/${token}`
+
+        //COMMENT FR LOCAL TESTING
+        const link = `${process.env.HEROKUHOST}/reset-password/${user._id}/${token}`
+
+        console.log(link)
+        //Send Email
+        let content = `<h3>Creative Teams </h3> <br / > <h4> Reset Password</h4> <p>Yoe can now reset your password by following the link bellow <br/> ${link} </p>`
+
+
+        sendMail(user.email, "Creative Teams | Reset Password", content)
+
+
+        //send a message to user to check email.
+        res.render("forgottenPassword", { message: "Password reset link sent to your email.", messageType: "Success" })
+    }
+
+})
+
+app.get('/reset-password/:id/:token', async (req, res) => {
+
+    const { id, token } = req.params;
+
+    //check if the id of the user exist 
+    const exists = await User.exists({ _id: id });
+    console.log("Exist is ", exists)
+    if (!exists) {
+        console.log("doesnt exist")
+        res.render("forgottenPassword", { message: "Email does not exist in our database", messageType: "Error" })
+        return;
+    }
+
+    //generate secret since we have a user in db
+    const user = await User.findOne({ _id: id })
+    console.log(user)
+    const secret = process.env.JWT_SECET + user.password;
+    try {
+        const payload = jwt.verify(token, secret)
+        res.render(`resetPassword`, { messageType: "Null", message: "", email: user.email })
+    } catch (e) {
+        console.log(e.message)
+        res.render(`resetPassword`, { messageType: "Error", message: "Opps!!! Something Went Wrong. Seems the link has Expires" })
+    }
+})
+
+app.post('/reset-password/:id/:token', async (req, res) => {
+    const { id, token } = req.params;
+    const { password, password2 } = req.body;
+    const exists = await User.exists({ _id: id });
+    if (!exists) {
+        console.log("doesnt exist")
+        res.render("resetPassword", { message: "Email does not exist in our database", messageType: "Error", email: "" })
+        return;
+    }
+
+    //generate secret since we have a user in db
+    const user = await User.findOne({ _id: id })
+    console.log(user)
+    const secret = process.env.JWT_SECET + user.password;
+
+    try {
+        const payload = jwt.verify(token, secret)
+
+        // validate passwords
+        if (password !== password2) {
+            res.render(`resetPassword`, { messageType: "Error", message: "Password does not match", email: user.email })
+            return
+        }
+
+        const validated = checkPassword(password)
+
+        if (!validated) {
+            res.render(`resetPassword`, { messageType: "Error", message: "Password must contain small letters, Capital, Special Characters and a number", email: user.email })
+            return
+        }
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const newUser = await User.updateOne({ _id: id }, {
+            $set:
+            {
+                password: hashedPassword,
+            }
+        })
+
+        let encodedMessage = encodeURIComponent('something that would break');
+        res.render('login', { title: 'Login / Sign Up', newError: "false", message: "Password reset successfull", error: "Null" });
+
+    } catch (e) {
+        console.log(e.message)
+
+        if (user) {
+            res.render(`resetPassword`, { messageType: "Error", message: "Someting went Wrong", email: user.email })
+            return
+        }
+
+        res.render(`resetPassword`, { messageType: "Error", message: e.message, email: "No User found" })
+
+    }
+
+})
+
 
 app.get('/setup', async (req, res) => {
     const exists = await User.exists({ email: "admin@gmail.com" });
@@ -433,14 +586,66 @@ app.get('/setup', async (req, res) => {
     });
 });
 
+const handleError = (err, res) => {
+    res.render('profile', { title: "Profile", user: req.user, messageType: "Error", message: "" })
+};
+
+var upload = multer({ dest: './public/data/uploads/' })
+
+app.get("/profileImg.jpg", (req, res) => {
+    res.sendFile(path.join(__dirname, "./uploads/profileImg.jpg"));
+});
+
+app.post("/upload", upload.single("file" /* name attribute of <file> element in your form */), (req, res) => {
+    const tempPath = req.file.path;
+    const targetPath = path.join(__dirname, "./uploads/profileImg.jpg");
+
+    if (path.extname(req.file.originalname).toLowerCase() === ".jpg") {
+        fs.rename(tempPath, targetPath, err => {
+            if (err) {
+                console.log("Erroe is ", error)
+                return handleError(err, res);
+            }
+
+            // res
+            //     .status(200)
+            //     .contentType("text/plain")
+            //     .end("File uploaded!");
+            res.render('profile', {
+                title: "Profile",
+                user: req.user,
+                messageType: "Success",
+                message: "File uploaded!"
+            })
+        });
+    } else {
+        fs.unlink(tempPath, err => {
+            res.render('profile', {
+                title: "Profile",
+                user: req.user,
+                messageType: "Error Message",
+                message: "Only .jpg files are allowed!"
+            })
+        });
+    }
+}
+);
+
 app.get("/instant-meeting", (req, res) => {
     let meetingId = uuidv4()
     res.redirect(`/${meetingId}`);
 })
 
+app.post("/instant-meeting/user", (req, res) => {
+    console.log(req.body.username)
+    username = req.body.username;
+    userEmail = req.body.useremail;
+    res.redirect(`/instant-meeting`);
+})
+
 app.get('/:room', (req, res) => {
-    // console.log("room Id ", req.params.room)
-    res.render('room', { roomId: req.params.room, title: "Room" })
+    // console.log("in room ")
+    res.render('room', { roomId: req.params.room, title: "Room", username, userEmail })
 })
 
 
@@ -462,9 +667,6 @@ const getMonthlyData = async (user) => {
     const fiveMonthBackEnds = moment().subtract(5, 'months').endOf('month')
     const sixMonthBackBegins = moment().subtract(6, 'months').startOf('month')
     const sixMonthBackEnds = moment().subtract(6, 'months').endOf('month')
-    const sevenMonthBackBegins = moment().subtract(7, 'months').startOf('month')
-    const sevenMonthBackEnds = moment().subtract(7, 'months').endOf('month')
-
 
     const monthlyMeeting = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(monthStart), $lte: new Date(monthEnd) } })
     const lastMonthCount = await Meeting.count({ userId: user._id, startAt: { $gte: new Date(lastMonthBegins), $lte: new Date(lastMonthEnds) } })
@@ -516,4 +718,10 @@ const getWeeklyData = async (userId) => {
         saturdayMeeting
     ]
 
+}
+
+//password validator
+function checkPassword(str) {
+    var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    return re.test(str);
 }

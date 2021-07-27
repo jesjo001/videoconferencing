@@ -23,7 +23,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"
       rel="stylesheet"
     />
- <%- include('./partials/dashboardHeadContent.ejs') %>
+ <%- include('./partials/dashboardHeadContent.ejs', {title: "Profile"}) %>
 </head>
 
 <body>
@@ -57,23 +57,29 @@
             <img src="/dashboard-assets/img/theme/img-1-1000x600.jpg" alt="Image placeholder" class="card-img-top">
             <div class="row justify-content-center">
               <div class="col-lg-3 order-lg-2">
-                <div class="card-profile-image">
-                  <a href="#">
-                    <img src="/dashboard-assets/img/theme/team-4.jpg" class="rounded-circle">
-                  </a>
-                </div>
+               
+                  <div class="card-profile-image">
+                    <a href="#">
+                      <img src="/profileImg.jpg" class="rounded-circle">
+                      
+                    </a>
+                  </div>
+                
               </div>
             </div>
             <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-              <div class="d-flex justify-content-between">
-                <a href="#" class="btn btn-sm btn-info  mr-4 ">Connect</a>
-                <a href="#" class="btn btn-sm btn-default float-right">Message</a>
+              <div class="d-flex justify-content-center">
+                <form method="post" enctype="multipart/form-data" action="/upload" name="uploadForm">
+                  <input type="file" id="profileImg" class="btn btn-sm btn-info mr-4 mt-6 align-content-center justify-content-center" name="file">
+                </form>
+                <!-- <a href="#" class="btn btn-sm btn-info  mr-4 ">Connect</a>
+                <a href="#" class="btn btn-sm btn-default float-right">Message</a> -->
               </div>
             </div>
             <div class="card-body pt-0">
               <div class="row">
                 <div class="col">
-                  <div class="card-profile-stats d-flex justify-content-center">
+                  <!-- <div class="card-profile-stats d-flex justify-content-center">
                     <div>
                       <span class="heading">22</span>
                       <span class="description">Friends</span>
@@ -86,12 +92,12 @@
                       <span class="heading">89</span>
                       <span class="description">Comments</span>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
               </div>
               <div class="text-center">
                 <h5 class="h3">
-                  <%=user.username %><span class="font-weight-light">, 27</span>
+                  <%=user.username %><span class="font-weight-light"></span>
                 </h5>
                 <div class="h5 font-weight-300">
                   <i class="ni location_pin mr-2"></i><%= user.city %>, <%= user.state %>
@@ -151,6 +157,36 @@
                       <div class="form-group">
                         <label class="form-control-label" for="input-last-name">Last name</label>
                         <input type="text" id="input-last-name" name="lastName" class="form-control" placeholder="Last name" value="<%= user.lastName%>">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-last-name">Date of Birth</label>
+                          <input
+                                  class="form-control"
+                                  placeholder="<%= user.dob %>"
+                                  type="date"
+                                  id="startdate"
+                                  name="yearOfBirth"
+                                  value="2018-07-22"
+                                  min="2021-01-01"
+                                  max="2030-12-31"
+                                />
+                        </div>
+                      <!-- <div class="form-group">
+                        <label class="form-control-label" for="input-last-name">Last name</label>
+                        <input type="text" id="input-last-name" name="lastName" class="form-control" placeholder="Last name" value="<%= user.lastName%>">
+                      </div> -->
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                          <label class="form-control-label" for="input-last-name">Sex</label>
+                          <select class="form-control" id="exampleFormControlSelect1" name="sex">
+                            <option>Male</option>
+                            <option>Female</option>
+                          </select>
                       </div>
                     </div>
                   </div>
@@ -251,12 +287,22 @@
     }
 
     if(messageType == "Error"){
-      toastr.error("Something went wrong");
+      toastr.error("Oops! Something went wrong!");
     }
+
+    if(messageType == "Error Message"){
+      toastr.error("<%= message %>");
+    }
+
     const updateButton = document.getElementById("updateButton");
       updateButton.addEventListener("click", () => {
         upDateValidation();
     });
+
+    const uploadImg = document.getElementById("profileImg");
+    uploadImg.addEventListener("change", () => {
+      document.uploadForm.submit();
+    })
 
     const upDateValidation =  ( )=> {
       console.log("validating")

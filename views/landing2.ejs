@@ -86,6 +86,8 @@
       </div>
     </nav>
 
+
+
     <div
       class="page-hero-section bg-image hero-home-1"
       style="background-image: url(/img/bg_hero_1.svg)"
@@ -112,12 +114,81 @@
               </button>
 
               <a
-                href="/instant-meeting"
                 class="btn btn-gradient btn-split-icon rounded-pill"
+                
+                data-toggle="modal"
+                data-target="#modal-default"
               >
                 <span class="icon mai-call-outline"></span> Start a meeting now
               </a>
             </div>
+
+            <div
+              class="modal fade"
+              id="modal-default"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="modal-default"
+              aria-hidden="true"
+            >
+              <div
+                class="modal-dialog modal- modal-dialog-centered modal-"
+                role="document"
+              >
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h6 class="modal-title" id="modal-title-default">
+                      Enter Name
+                    </h6>
+                    <a
+                      type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">×</span>
+                  </a>
+                  </div>
+
+                  <form role="form" action="/instant-meeting/user" method="POST">
+                        <div class="modal-body">
+                        
+                          <div class="text-center px-lg-4 py-lg-0">
+                              <!-- <i class="ni ni-bell-55 ni-3x"></i> -->
+                              <h4 class="heading mt-4">Enter a username to join</h4>
+                              <!-- <p class="mx-5">You can schedule your meeting by filling the form bellow.</p> -->
+                          </div>
+                        
+                          <div class="card-body px-lg-5 py-lg-3" style="border-bottom: none;">
+                                <div class="form-group mb-3" >
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <input
+                                      class="form-control"
+                                      placeholder="Meeting Title"
+                                      type="text"
+                                      id="username"
+                                      name="username"
+                                      required
+                                    />
+                                  </div>
+                                </div>           
+                          </div>
+                        
+
+                  <div class="modal-footer mx-4" style="border-top: none;">
+                    <button type="submit" class="btn btn-primary">Enter Chat</button>
+                    
+                  </div>
+                  </div>
+                  </form> 
+                </div>
+              </div>
+            </div>
+
             <div class="col-lg-6 d-none d-lg-block wow zoomIn">
               <div class="img-place mobile-preview shadow floating-animate">
                 <img src="/img/app_preview_1.png" alt="" />

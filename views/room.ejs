@@ -26,12 +26,14 @@
       integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG"
       crossorigin="anonymous"
     ></script>
-    <script
+
+     <!-- <script src="/js/jquery-3.5.1.min.js"></script> -->
+    <!-- <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
       integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc"
       crossorigin="anonymous"
-    ></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    ></script> -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"
       rel="stylesheet"
@@ -42,12 +44,36 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
+        /* under testing section */
+        flex-direction:row;
+
       }
       video {
-        height: 300px;
-        width: 400px;
+        max-height: 300px;
+        max-width: 400px;
+        padding: 8px;
+        border-radius: 20px;
+        /* under testing */
+        flex:1 1 auto;
+        /* End testing section */
+        object-fit: cover;
+
+      }
+
+      video:hover {
         object-fit: cover;
         padding: 8px;
+        border-radius: 20px;
+
+
+        box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ;
+        -webkit-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ;
+        -moz-box-shadow: -2px 1px 15px rgba(145, 145, 145, 0.7)  ;
+        -moz-transform: scale(1.3);
+        -webkit-transform: scale(1.3);
+        -o-transform: scale(1.3);
+        -ms-transform: scale(1.3);
+        transform: scale(1.3);
       }
     </style>
   </head>
@@ -61,40 +87,40 @@
         <div class="main_controls">
           <div class="main_controls_block">
             <div
+              data-toggle="tooltip" data-placement="top" title="Mute/Unmute"
               onclick="muteUnmute()"
               class="main_controls_button main_mute_button"
             >
               <i class="fas fa-microphone"></i>
-              <span>Mute</span>
+              <span></span>
             </div>
             <div
+              data-toggle="tooltip" data-placement="top" title="Play/Pause Video"
               onclick="playStop()"
               class="main_controls_button main_video_button"
             >
               <i class="fas fa-video"></i>
-              <span>Stop Video</span>
+              <span></span>
             </div>
           </div>
 
           <div class="main_controls_block">
-            <div class="main_controls_button">
+            <div class="main_controls_button users" onclick="toogleUsers()" data-toggle="tooltip" data-placement="top" title="Participants">
               <i class="fas fa-user-friends"></i>
-              <span>Security</span>
             </div>
-            <div class="main_controls_button">
+            <div class="main_controls_button settings" data-toggle="tooltip" onclick="toggleSettings()" data-placement="top" title="Settings">
               <i class="fas fa-shield-alt"></i>
-              <span>Participants</span>
             </div>
-            <div class="main_controls_button">
+            <div class="main_controls_button comment" onclick="hideChat()" data-toggle="tooltip" data-placement="top" title="Toggle Chat">
               <i class="fas fa-comment-alt"></i>
-              <span>Chat</span>
             </div>
           </div>
+
           <div class="main_controls_block">
-            <div class="main_controls_button">
+            <div class="main_controls_button" data-toggle="tooltip" data-placement="top" title="Exit">
               <span class="leave_meeting"
                 ><a href="/" style="text-decoration: none; color: lightpink"
-                  >Leave Meeting</a
+                  ><i class="fa fa-power-off" aria-hidden="true"></i></a
                 ></span
               >
             </div>
@@ -102,7 +128,7 @@
         </div>
       </div>
 
-      <div class="main_right">
+      <div class="main_right" style="display:none">
         <div class="main_header">
           <h6>Chat</h6>
         </div>
@@ -114,6 +140,200 @@
           <input id="chat_messge" type="text" placeholder="Type message here" />
         </div>
       </div>
+
+      <div class="main_right_users" id="userArea" style="display:none;">
+        <div class="main_header">
+          <h6 class="title text-white-50">Users online</h6>
+
+        </div>
+
+        <div class="main_users_window">
+          <ul class="messages userArea" id="userAreas">
+            <span class="title">
+              <!-- <li class="user_list">user 1</li> -->
+            </span>
+          </ul>
+        </div>
+      </div>
+
+      <div class="main_right_settings" id="settingsMainArea" style="display:none;">
+        <div class="main_header">
+          <h6 class="title text-white-50">Settings</h6>
+
+        </div>
+
+        <div class="main_users_window">
+
+          <ul class="settingsPanel settingsArea" >
+            <form>
+              <div class="form-group mb-3">
+                <div class="">
+                  <label for="inputState" id="formLabels">Send Video Resolution </label>
+                <select id="sendVideoResolution" class="form-select inputState" onClick="changeVideoSettings()">
+                  <option selected>Choose...</option>
+                  <option value="240">240p </option>
+                  <option value="360">360p </option>
+                  <option value="480">480p </option>
+                  <option value="720">720p </option>
+                  <option value="1080">1080p </option>
+                </select>
+                </div>
+
+              </div>
+
+              <div class="form-group mb-3">
+                <div class="">
+                  <label for="inputState" id="formLabels">Receive Video Resolution </label>
+                  <select id="receiveVideoRes" class="form-select inputState" id="formDropDown">
+                  <option selected>Choose...</option>
+                  <option value="360">360p </option>
+                  <option value="480">480p </option>
+                  <option value="720">720p </option>
+                  <option value="1080">1080p </option>
+                </select>
+                </div>
+
+              </div>
+
+              <div class="form-group mb-3" id="formContainer">
+                <div class="">
+                  <div class="custom-control custom-switch">
+                    <label class="custom-control-label " for="customSwitch1" id="formLabels">Stop incoming videos</label>
+                    <input type="checkbox" class="custom-control-input ml-3" id="usersVideoToggle" onclick="stopUsersVideo()">
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-3" id="formContainer">
+                <div class="">
+                  <div class="custom-control custom-switch">
+                    <label class="custom-control-label " for="customSwitch1" id="formLabels">Stop my videos</label>
+                    <input type="checkbox" class="custom-control-input ml-3" id="customSwitch1" onclick="playStop()">
+
+                  </div>
+                </div>
+              </div>
+            </form>
+            <l>
+
+            </l>
+          </ul>
+        </div>
+      </div>
+
+    <!-- <div class="modal fade bd-example-modal-lg" data-target="#settingsModal" tabindex="-1" id="settingsModal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <h3>Enter Email to Enter Chat</h3>
+            <hr>
+
+            <form>
+              <input type="email" id="email" name="email">
+              <button type="submit" class="btn btn-success">Enter Chat</button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+      ...
     </div>
+    </div>
+    </div> -->
+
+
+                <div
+              class="modal fade"
+              id="settingsModal"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="modal-default"
+              aria-hidden="true"
+            >
+              <div
+                class="modal-dialog modal- modal-dialog-centered modal-"
+                role="document"
+              >
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h6 class="modal-title" id="modal-title-default">
+                      Enter Email
+                    </h6>
+                  </div>
+
+                  <form role="form" action="/instant-meeting/user" method="POST">
+                        <div class="modal-body">
+
+                          <div class="px-lg-5 py-lg-0">
+                              <!-- <i class="ni ni-bell-55 ni-3x"></i> -->
+                              <h4 class="heading ">Enter your email to join meeting</h4>
+                              <!-- <p class="mx-5">You can schedule your meeting by filling the form bellow.</p> -->
+                          </div>
+
+                          <div class="card-body px-lg-5 py-lg-2" style="border-bottom: none;">
+                                <div class="form-group mb-3" >
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <input
+                                        class="form-control"
+                                        placeholder="Username"
+                                        type="text"
+                                        id="username"
+                                        name="username"
+                                        required
+                                      />
+                                  </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                  <div
+                                    class="
+                                      input-group input-group-merge input-group-alternative
+                                    "
+                                  >
+                                    <input
+                                      class="form-control"
+                                      placeholder="Email"
+                                      type="email"
+                                      id="useremail"
+                                      name="useremail"
+                                      required
+                                    />
+                                  </div>
+
+                                </div>
+                          </div>
+
+
+                  <div class="modal-footer  px-lg-5 py-lg-0" style="border-top: none;">
+                    <button type="submit" class="btn btn-primary">Join Meeting</button>
+
+                  </div>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+    </div>
+
+
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/owl-carousel/js/owl.carousel.min.js"></script>
+    <script src="/vendor/wow/wow.min.js"></script>
+    <script src="/js/mobster.js"></script>
+    <script>
+
+    let username = "<%=username%>"
+   let userEmail  = "<%=userEmail%>"
+
+
+    </script>
   </body>
 </html>

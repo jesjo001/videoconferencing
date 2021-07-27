@@ -17,7 +17,7 @@
 <html>
 
 <head>
-<%- include('./partials/dashboardHeadContent.ejs') %>
+<%- include('./partials/dashboardHeadContent.ejs', { title : "Meeting List"}) %>
 </head>
 <script>
   let test = <%-JSON.stringify(upcomingMeeting) %>;
