@@ -7,7 +7,9 @@ let peer = new Peer(undefined, {
     host: '/',
     port: '443'
 })
-
+let userStreamId = [];
+let usersStreams = []
+let playOthersVideo = true;
 let newUser = username;
 let userMail = userEmail;
 
@@ -18,10 +20,10 @@ const peers = {}
 let videoConstraint = {
     video: true,
     audio: {
-            sampleSize: 16,
-            channelCount: 2,
-            echoCancellation: true,
-            noiseSuppression: true
+              sampleSize: 16,
+              channelCount: 2,
+              echoCancellation: true,
+              noiseSuppression: true
            }
 }
 navigator.mediaDevices.getUserMedia(videoConstraint)
@@ -36,12 +38,16 @@ navigator.mediaDevices.getUserMedia(videoConstraint)
             call.on('stream', userVideoStream => {
                 addVideoStream(video, userVideoStream)
                 attachUser(newUser)
+                // UserDetailsModal()
             })
         })
 
         socket.on('user-connected', (userId) => {
-            connectToNewUser(userId, myVideoStream);
+            connectToNewUser(userId, stream);
+            console.log(stream)
             attachUser(newUser)
+
+            userStreamId.push({ streamId: stream.id, userName: newUser})
         })
 
         let text = $('input')
@@ -90,6 +96,8 @@ const connectToNewUser = (userId, stream) => {
     const video = document.createElement('video')
     call.on('stream', userVideoStream => {
         addVideoStream(video, userVideoStream)
+        userStreamId.push({ streamId:userVideoStream.id, userName:newUser})
+
     })
     call.on('close', () => {
         video.remove()
@@ -99,7 +107,10 @@ const connectToNewUser = (userId, stream) => {
 }
 
 const addVideoStream = (video, stream) => {
+  console.log("Video stream is ");
+    console.log(stream);
     video.srcObject = stream;
+    usersStreams.push(stream)
     video.addEventListener('loadedmetadata', () => {
         video.play()
     })
@@ -144,34 +155,38 @@ const playStop = () => {
 
 const playStopOthersVideo = () => {
     console.log("Got here ")
-    let videoTracks = myVideoStream.getVideoTracks();
-console.log("numbers of video are ", videoTracks.length);
+    console.log("users and ids")
+    console.log(userStreamId)
+
+    let userVideos = document.getElementsByTagName('video')
+    console.log('No of videos: ', userVideos.length)
+    console.log(userVideos);
+
     let count = 0
+    let playedCount = 0
 
-    videoTracks.forEach((track, i) => {
-      if(track.enabled && i !== 0){
-        track.enabled = false;
-        console.log("index enabled is: ", i);
-        count ++
+    for(i=0; i < userVideos.length; i++){
 
-      } else if(track.disabled && i !== 0) {
-        track.enabled = true;
-        console.log("index disabled is: ", i);
-        count ++
+        if(playOthersVideo){
+          userVideos[i].pause()
+          playOthersVideo = false;
+          console.log("video paused: ", count++);
+          console.log("paused");
+          count++
+        } else {
+          userVideos[i].play()
+          playOthersVideo = true;
+          console.log("video played: ", playedCount++);
+          console.log("playing");
+          playedCount++
+        }
+        // userVideos[i].onplay = (event) => {
+        //   console.log('The Boolean paused property is now false. Either the ' +
+        //   'play() method was called or the autoplay attribute was toggled.');
+        //   userVideos[i].pause()
+        // };
+
       }
-
-      console.log("Videos Enabled/disabled are ", count)
-
-    });
-
-    // let enabled = myVideoStream.getVideoTracks()[0].enabled;
-    // if (enabled) {
-    //     myVideoStream.getVideoTracks()[0].enabled = false;
-    //     setStopVideo()
-    // } else {
-    //     setPlayVideoIcon()
-    //     myVideoStream.getVideoTracks()[0].enabled = true;
-    // }
 }
 
 const setMuteButton = () => {
@@ -317,31 +332,33 @@ const toggleSettings = () => {
     }
 }
 
-// Modal for username upon entering chat
-if (newUser === "user") {
-    console.log("user needs a dialog")
+const UserDetailsModal = () => {
 
-    $('#settingsModal').modal({
-        keyboard: false,
-        show: true,
-        backdrop: 'static'
-    })
-}
+  if (newUser === "user") {
+      console.log("user needs a dialog")
 
-const setSupportedConstraints = () => {
-    let constraintList = document.getElementById("sendVideoResolution");
-    let supportedConstraints = navigator.mediaDevices.getSupportedConstraints();
-
-    for (let constraint in supportedConstraints) {
-        if (supportedConstraints.hasOwnProperty(constraint)) {
-            let elem = document.createElement("option", { value: constraint });
-            const newContent = document.createTextNode(`${constraint}`);
-            elem.appendChild(newContent);
-            constraintList.appendChild(elem);
-        }
-    }
+      $('#settingsModal').modal({
+          keyboard: false,
+          show: true,
+          backdrop: 'static'
+      })
+  }
 
 }
+
+// const setSupportedConstraints = () => {
+//     let constraintList = document.getElementById("sendVideoResolution");
+//     let supportedConstraints = navigator.mediaDevices.getSupportedConstraints();
+//
+//     for (let constraint in supportedConstraints) {
+//         if (supportedConstraints.hasOwnProperty(constraint)) {
+//             let elem = document.createElement("option", { value: constraint });
+//             const newContent = document.createTextNode(`${constraint}`);
+//             elem.appendChild(newContent);
+//             constraintList.appendChild(elem);
+//         }
+//     }
+// }
 
 
 const changeVideoSettings = () => {
@@ -381,4 +398,15 @@ const stopUsersVideo = () => {
     playStopOthersVideo()
   }
   // playStopOthersVideo()
+}
+
+//Modal for username upon entering chat
+if (newUser === "user") {
+    console.log("user needs a dialog")
+
+    $('#settingsModal').modal({
+        keyboard: false,
+        show: true,
+        backdrop: 'static'
+    })
 }
