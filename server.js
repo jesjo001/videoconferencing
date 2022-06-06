@@ -27,10 +27,13 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 //connect to db
-const port = process.env.PORT || 3030
+const port = process.env.PORT || 8080
 const dbURI = process.env.MONGODBURI
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((result) => server.listen(port))
+    .then((result) => {
+        console.log('server running on port ',port)
+        server.listen(port)
+    })
     .catch((err) => console.log(err))
 
 //Error
@@ -470,10 +473,10 @@ app.post('/forgotten-password', async (req, res) => {
         const token = jwt.sign(payload, secret, { expiresIn: '15m' })
 
         //Uncomment section for local testing 
-        // const link = `${process.env.HOST}${process.env.PORT}/reset-password/${user._id}/${token}`
+        const link = `${process.env.HOST}${process.env.PORT}/reset-password/${user._id}/${token}`
 
         //COMMENT FR LOCAL TESTING
-        const link = `${process.env.HEROKUHOST}/reset-password/${user._id}/${token}`
+        // const link = `${process.env.HEROKUHOST}/reset-password/${user._id}/${token}`
 
         console.log(link)
         //Send Email
