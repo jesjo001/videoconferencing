@@ -3,6 +3,7 @@ const app = express();
 require('dotenv').config()
 //
 const bcrypt = require('bcrypt')
+const parseArgs = require('minimist');
 const server = require('http').Server(app);
 const { v4: uuidv4 } = require('uuid')
 const io = require('socket.io')(server)
@@ -27,12 +28,19 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 //connect to db
-const port = process.env.PORT || 8080
+let startPort = process.env.PORT 
 const dbURI = process.env.MONGODBURI
+
+if(startPort === undefined){
+    const args = parseArgs(process.argv.slice(2));
+    const { port = '8080'} = args;
+    startPort = port;
+}
+
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then((result) => {
-        console.log('server running on port ',port)
-        server.listen(port)
+        console.log('server running on port ',startPort)
+        server.listen(startPort)
     })
     .catch((err) => console.log(err))
 
