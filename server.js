@@ -3,9 +3,23 @@ const app = express();
 require('dotenv').config()
 //
 const bcrypt = require('bcrypt')
+const parseArgs = require('minimist');
 const server = require('http').Server(app);
 const { v4: uuidv4 } = require('uuid')
-const io = require('socket.io')(server)
+const { Server } = require("socket.io");
+
+const io = require('socket.io')(server, {
+    cors: {
+            origin: ["http://localhost:8080", "https://localhost:8080", 
+            "http://localhost:8081", "https://localhost:8081",
+            "http://localhost:8082", "https://localhost:8082", 
+            "http://meeting.automationlounge.com", "https://meeting.automationlounge.com",
+            ],
+            allowedHeaders: ["my-custom-header"],
+            credentials: true
+    },
+    allowEIO3: true
+});
 const { ExpressPeerServer } = require('peer')
 const User = require('./models/blog')
 const Meeting = require('./models/meeting')
@@ -27,12 +41,17 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 //connect to db
-const port = process.env.PORT || 8080
+let startPort = process.env.PORT 
 const dbURI = process.env.MONGODBURI
+
+const args = parseArgs(process.argv.slice(2));
+const { port } = args;
+if(port !== undefined ) startPort = port;
+
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then((result) => {
-        console.log('server running on port ',port)
-        server.listen(port)
+        console.log('server running on port ',startPort)
+        server.listen(startPort)
     })
     .catch((err) => console.log(err))
 
@@ -42,7 +61,7 @@ let newError = false;
 let loggedIn = false;
 let username = "user";
 let userEmail = "NIL";
-
+let meetingId = ""
 //Middlewares
 app.set('view engine', 'ejs');
 app.use(express.static('public'))
@@ -635,7 +654,8 @@ app.post("/upload", upload.single("file" /* name attribute of <file> element in 
 );
 
 app.get("/instant-meeting", (req, res) => {
-    let meetingId = uuidv4()
+    
+    if(meetingId === "") meetingId = uuidv4();
     res.redirect(`/${meetingId}`);
 })
 
@@ -648,6 +668,7 @@ app.post("/instant-meeting/user", (req, res) => {
 
 app.get('/:room', (req, res) => {
     // console.log("in room ")
+    meetingId = req.params.room;
     res.render('room', { roomId: req.params.room, title: "Room", username, userEmail })
 })
 
