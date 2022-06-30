@@ -6,20 +6,15 @@ const bcrypt = require('bcrypt')
 const parseArgs = require('minimist');
 const server = require('http').Server(app);
 const { v4: uuidv4 } = require('uuid')
-const { Server } = require("socket.io");
-
-const io = require('socket.io')(server, {
-    cors: {
-            origin: ["http://localhost:8080", "https://localhost:8080", 
-            "http://localhost:8081", "https://localhost:8081",
-            "http://localhost:8082", "https://localhost:8082", 
-            "http://meeting.automationlounge.com", "https://meeting.automationlounge.com",
-            ],
-            allowedHeaders: ["my-custom-header"],
-            credentials: true
-    },
-    allowEIO3: true
+const io = require('socket.io')(server,{
+  cors: {
+    origin: "*"
+  },
+  pingInterval: 1000 * 60 * 5,
+  pingTimeout: 1000 * 60 * 3,
+  allowEIO3: true // false by default
 });
+
 const { ExpressPeerServer } = require('peer')
 const User = require('./models/blog')
 const Meeting = require('./models/meeting')
@@ -61,7 +56,7 @@ let newError = false;
 let loggedIn = false;
 let username = "user";
 let userEmail = "NIL";
-let meetingId = ""
+let meetingId = "";
 //Middlewares
 app.set('view engine', 'ejs');
 app.use(express.static('public'))
@@ -654,7 +649,7 @@ app.post("/upload", upload.single("file" /* name attribute of <file> element in 
 );
 
 app.get("/instant-meeting", (req, res) => {
-    
+    console.log("meet id >>" ,meetingId)
     if(meetingId === "") meetingId = uuidv4();
     res.redirect(`/${meetingId}`);
 })
@@ -667,8 +662,9 @@ app.post("/instant-meeting/user", (req, res) => {
 })
 
 app.get('/:room', (req, res) => {
-    // console.log("in room ")
-    meetingId = req.params.room;
+    console.log("in room >> ", req.params.room)
+    if(req.params.rooom !== "favicon.ico") meetingId = req.params.room;
+    
     res.render('room', { roomId: req.params.room, title: "Room", username, userEmail })
 })
 
